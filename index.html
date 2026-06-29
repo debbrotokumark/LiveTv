@@ -4,19 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>M3U8 Live Stream Viewer</title>
-
-    <!-- hls.js for HLS playback -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@0.14.17/dist/hls.min.js">
-    </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@0.14.17/dist/hls.min.js"></script>
     <style>
-        /* ───────────── reset & base ───────────── */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             background: #0b0d11;
@@ -27,952 +17,625 @@
             align-items: center;
             padding: 20px;
         }
-
         .app-container {
             max-width: 1000px;
             width: 100%;
             background: #151a22;
             border-radius: 28px;
             padding: 28px 30px 34px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
             border: 1px solid #2a303c;
             transition: border-color 0.25s;
         }
+        .app-container:hover { border-color: #3f485a; }
 
-        .app-container:hover {
-            border-color: #3f485a;
-        }
-
-        /* ───────────── header ───────────── */
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 22px;
-        }
-
-        .header .icon {
-            font-size: 28px;
-            line-height: 1;
-        }
-
+        /* header */
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+        .header .icon { font-size: 28px; line-height: 1; }
         .header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
+            font-size: 24px; font-weight: 600; letter-spacing: -0.3px;
             background: linear-gradient(135deg, #f0f4ff 0%, #94b0ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
         .header .badge {
-            margin-left: auto;
-            font-size: 12px;
-            background: #1f2a3a;
-            padding: 4px 14px;
-            border-radius: 100px;
-            color: #9bb1d0;
-            border: 1px solid #2d384a;
-            letter-spacing: 0.3px;
+            margin-left: auto; font-size: 12px; background: #1f2a3a;
+            padding: 4px 14px; border-radius: 100px; color: #9bb1d0;
+            border: 1px solid #2d384a; letter-spacing: 0.3px;
         }
 
-        /* ───────────── URL bar ───────────── */
-        .url-section {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
+        /* server buttons */
+        .server-row {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+            align-items: center;
+        }
+        .server-label {
+            font-size: 12px; color: #5a6f8f; text-transform: uppercase;
+            letter-spacing: 0.8px; font-weight: 600; margin-right: 4px;
+        }
+        .btn-server {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 18px; border: 1.5px solid #2a3a52;
+            border-radius: 100px; background: #111924; color: #9bb8e0;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; white-space: nowrap; letter-spacing: 0.2px;
+        }
+        .btn-server:hover {
+            background: #1a2a3e; border-color: #4d70c0; color: #c8d6f0;
+            transform: translateY(-1px); box-shadow: 0 4px 14px rgba(59,108,244,0.2);
+        }
+        .btn-server.active {
+            background: linear-gradient(135deg, #1c2e52, #1a2040);
+            border-color: #5a7bcf; color: #a8c4ff;
+            box-shadow: 0 0 0 3px rgba(74,120,255,0.12);
+        }
+        .btn-server .server-dot {
+            width: 7px; height: 7px; border-radius: 50%; background: #2f4060;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .btn-server.active .server-dot, .btn-server:hover .server-dot {
+            background: #3be08b; box-shadow: 0 0 8px rgba(59,224,139,0.5);
         }
 
-        .url-input-wrapper {
-            flex: 1;
-            min-width: 220px;
-            position: relative;
-        }
-
+        /* URL bar */
+        .url-section { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+        .url-input-wrapper { flex: 1; min-width: 220px; position: relative; }
         .url-input-wrapper input {
-            width: 100%;
-            padding: 14px 18px;
-            background: #0f141c;
-            border: 1.5px solid #28303e;
-            border-radius: 16px;
-            color: #eef3fc;
-            font-size: 15px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            outline: none;
-            transition: border-color 0.25s, box-shadow 0.2s;
-            letter-spacing: 0.2px;
+            width: 100%; padding: 14px 18px; background: #0f141c;
+            border: 1.5px solid #28303e; border-radius: 16px; color: #eef3fc;
+            font-size: 15px; font-family: 'SF Mono', 'Fira Code', monospace;
+            outline: none; transition: border-color 0.25s, box-shadow 0.2s; letter-spacing: 0.2px;
         }
-
         .url-input-wrapper input:focus {
-            border-color: #5a7bcf;
-            box-shadow: 0 0 0 4px rgba(74, 120, 255, 0.15);
+            border-color: #5a7bcf; box-shadow: 0 0 0 4px rgba(74,120,255,0.15);
         }
-
-        .url-input-wrapper input::placeholder {
-            color: #4f5a6e;
-            font-family: 'Segoe UI', sans-serif;
-            letter-spacing: 0px;
-        }
+        .url-input-wrapper input::placeholder { color: #4f5a6e; font-family: 'Segoe UI', sans-serif; letter-spacing: 0; }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border: none;
-            border-radius: 16px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 14px 28px; border: none; border-radius: 16px;
+            font-weight: 600; font-size: 15px; cursor: pointer;
+            transition: all 0.2s ease; white-space: nowrap;
         }
-
         .btn-primary {
-            background: linear-gradient(135deg, #3b6cf4, #5a3fd6);
-            color: #fff;
-            box-shadow: 0 6px 20px rgba(59, 108, 244, 0.25);
+            background: linear-gradient(135deg, #3b6cf4, #5a3fd6); color: #fff;
+            box-shadow: 0 6px 20px rgba(59,108,244,0.25);
         }
-
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(59, 108, 244, 0.35);
+            transform: translateY(-2px); box-shadow: 0 10px 28px rgba(59,108,244,0.35);
             background: linear-gradient(135deg, #4d7aff, #6b4fe6);
         }
+        .btn-primary:active { transform: translateY(0px); box-shadow: 0 4px 12px rgba(59,108,244,0.3); }
+        .btn-secondary { background: #1f2a3a; color: #c8d6f0; border: 1px solid #2f3a4e; }
+        .btn-secondary:hover { background: #2b384c; border-color: #40506a; color: #fff; }
+        .btn-success { background: #1e8b4c; color: #fff; box-shadow: 0 4px 16px rgba(30,139,76,0.25); }
+        .btn-success:hover { background: #24a05a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,139,76,0.35); }
+        .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 12px; }
 
-        .btn-primary:active {
-            transform: translateY(0px);
-            box-shadow: 0 4px 12px rgba(59, 108, 244, 0.3);
-        }
-
-        .btn-secondary {
-            background: #1f2a3a;
-            color: #c8d6f0;
-            border: 1px solid #2f3a4e;
-        }
-
-        .btn-secondary:hover {
-            background: #2b384c;
-            border-color: #40506a;
-            color: #fff;
-        }
-
-        .btn-success {
-            background: #1e8b4c;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(30, 139, 76, 0.25);
-        }
-
-        .btn-success:hover {
-            background: #24a05a;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(30, 139, 76, 0.35);
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 13px;
-            border-radius: 12px;
-        }
-
-        /* ───────────── action row ───────────── */
-        .action-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
+        /* action row */
+        .action-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
         .action-row .status-badge {
-            font-size: 13px;
-            color: #8fa2c4;
-            background: #151f2b;
-            padding: 6px 16px;
-            border-radius: 100px;
-            border: 1px solid #26303f;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 13px; color: #8fa2c4; background: #151f2b;
+            padding: 6px 16px; border-radius: 100px; border: 1px solid #26303f;
+            display: inline-flex; align-items: center; gap: 6px;
         }
-
         .action-row .status-badge .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            background: #4f5a6e;
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: #4f5a6e;
         }
-
         .action-row .status-badge .dot.active {
-            background: #3be08b;
-            box-shadow: 0 0 12px rgba(59, 224, 139, 0.4);
+            background: #3be08b; box-shadow: 0 0 12px rgba(59,224,139,0.4);
         }
-
         .action-row .saved-link-hint {
-            font-size: 13px;
-            color: #7a8db0;
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 13px; color: #7a8db0; margin-left: auto;
+            display: flex; align-items: center; gap: 6px;
         }
+        .action-row .saved-link-hint .link-icon { font-size: 16px; }
 
-        .action-row .saved-link-hint .link-icon {
-            font-size: 16px;
-        }
-
-        /* ───────────── video player ───────────── */
+        /* video */
         .player-wrapper {
-            margin-top: 20px;
-            border-radius: 18px;
-            overflow: hidden;
-            background: #0a0e14;
-            position: relative;
-            border: 1px solid #212a36;
-            transition: border-color 0.3s;
+            margin-top: 20px; border-radius: 18px; overflow: hidden;
+            background: #0a0e14; position: relative; border: 1px solid #212a36; transition: border-color 0.3s;
         }
-
-        .player-wrapper:focus-within {
-            border-color: #4d70c0;
-        }
-
+        .player-wrapper:focus-within { border-color: #4d70c0; }
         #videoPlayer {
-            width: 100%;
-            display: block;
-            aspect-ratio: 16 / 9;
-            background: #080b10;
-            object-fit: contain;
+            width: 100%; display: block; aspect-ratio: 16/9;
+            background: #080b10; object-fit: contain;
         }
-
-        /* fallback / placeholder overlay */
         .player-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            aspect-ratio: 16 / 9;
-            background: #0d121b;
-            color: #3f4c62;
-            font-size: 15px;
-            gap: 12px;
-            padding: 30px;
-            text-align: center;
-            border-radius: 18px;
-            user-select: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            aspect-ratio: 16/9; background: #0d121b; color: #3f4c62;
+            font-size: 15px; gap: 12px; padding: 30px; text-align: center;
+            border-radius: 18px; user-select: none;
         }
-
-        .player-placeholder .big-icon {
-            font-size: 52px;
-            opacity: 0.5;
-        }
-
-        .player-placeholder .sub {
-            font-size: 13px;
-            color: #324053;
-        }
-
-        .player-wrapper.loading .player-placeholder .big-icon {
-            animation: pulse 1.2s ease-in-out infinite;
-        }
-
+        .player-placeholder .big-icon { font-size: 52px; opacity: 0.5; }
+        .player-placeholder .sub { font-size: 13px; color: #324053; }
+        .player-wrapper.loading .player-placeholder .big-icon { animation: pulse 1.2s ease-in-out infinite; }
         @keyframes pulse {
-            0%,
-            100% {
-                opacity: 0.4;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.9;
-                transform: scale(1.06);
-            }
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.06); }
         }
 
-        /* ───────────── saved links list ───────────── */
-        .saved-links-section {
-            margin-top: 24px;
-            border-top: 1px solid #202835;
-            padding-top: 20px;
-        }
-
-        .saved-links-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
+        /* saved links */
+        .saved-links-section { margin-top: 24px; border-top: 1px solid #202835; padding-top: 20px; }
+        .saved-links-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .saved-links-header h3 {
-            font-size: 15px;
-            font-weight: 500;
-            color: #b2c4e0;
-            letter-spacing: 0.2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 15px; font-weight: 500; color: #b2c4e0; letter-spacing: 0.2px;
+            display: flex; align-items: center; gap: 8px;
         }
-
         .saved-links-header h3 span {
-            background: #1f2a3a;
-            font-size: 12px;
-            padding: 0 10px;
-            border-radius: 100px;
-            color: #8fa2c4;
+            background: #1f2a3a; font-size: 12px; padding: 0 10px;
+            border-radius: 100px; color: #8fa2c4;
         }
-
         .saved-links-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            max-height: 100px;
-            overflow-y: auto;
-            padding-right: 4px;
+            display: flex; flex-wrap: wrap; gap: 8px; max-height: 100px;
+            overflow-y: auto; padding-right: 4px;
         }
-
-        .saved-links-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .saved-links-list::-webkit-scrollbar-track {
-            background: #141b24;
-            border-radius: 10px;
-        }
-        .saved-links-list::-webkit-scrollbar-thumb {
-            background: #2f3c50;
-            border-radius: 10px;
-        }
-
+        .saved-links-list::-webkit-scrollbar { width: 4px; }
+        .saved-links-list::-webkit-scrollbar-track { background: #141b24; border-radius: 10px; }
+        .saved-links-list::-webkit-scrollbar-thumb { background: #2f3c50; border-radius: 10px; }
         .saved-link-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #121a24;
-            padding: 6px 14px 6px 16px;
-            border-radius: 100px;
-            border: 1px solid #26303f;
-            font-size: 13px;
-            color: #c8d6f0;
-            cursor: pointer;
-            transition: all 0.2s;
-            max-width: 320px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: inline-flex; align-items: center; gap: 6px; background: #121a24;
+            padding: 6px 14px 6px 16px; border-radius: 100px; border: 1px solid #26303f;
+            font-size: 13px; color: #c8d6f0; cursor: pointer; transition: all 0.2s;
+            max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
         .saved-link-chip:hover {
-            background: #1c283a;
-            border-color: #3a4b64;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            background: #1c283a; border-color: #3a4b64;
+            transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
-
-        .saved-link-chip .chip-index {
-            color: #5a6f8f;
-            font-weight: 500;
-            font-size: 11px;
-            margin-right: 2px;
-        }
-
+        .saved-link-chip .chip-index { color: #5a6f8f; font-weight: 500; font-size: 11px; margin-right: 2px; }
         .saved-link-chip .remove-btn {
-            background: none;
-            border: none;
-            color: #5a6f8f;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 0 2px;
-            line-height: 1;
-            transition: color 0.2s;
+            background: none; border: none; color: #5a6f8f; font-size: 16px;
+            cursor: pointer; padding: 0 2px; line-height: 1; transition: color 0.2s;
         }
+        .saved-link-chip .remove-btn:hover { color: #f06767; }
+        .empty-links-msg { color: #3e4b60; font-size: 13px; padding: 6px 0; }
 
-        .saved-link-chip .remove-btn:hover {
-            color: #f06767;
-        }
-
-        .empty-links-msg {
-            color: #3e4b60;
-            font-size: 13px;
-            padding: 6px 0;
-        }
-
-        /* ───────────── responsive ───────────── */
+        /* responsive */
         @media (max-width: 720px) {
-            .app-container {
-                padding: 18px 16px 22px;
-                border-radius: 20px;
-            }
-
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .url-section {
-                flex-direction: column;
-            }
-
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-
-            .action-row .saved-link-hint {
-                margin-left: 0;
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .saved-link-chip {
-                max-width: 200px;
-                font-size: 12px;
-                padding: 5px 12px 5px 14px;
-            }
+            .app-container { padding: 18px 16px 22px; border-radius: 20px; }
+            .header h1 { font-size: 20px; }
+            .url-section { flex-direction: column; }
+            .btn { padding: 12px 20px; font-size: 14px; }
+            .action-row .saved-link-hint { margin-left: 0; width: 100%; justify-content: flex-start; }
+            .saved-link-chip { max-width: 200px; font-size: 12px; padding: 5px 12px 5px 14px; }
         }
-
         @media (max-width: 440px) {
-            .header .badge {
-                display: none;
-            }
-            .saved-link-chip {
-                max-width: 140px;
-            }
+            .header .badge { display: none; }
+            .saved-link-chip { max-width: 140px; }
         }
 
-        /* ───────────── utility ───────────── */
-        .hidden {
-            display: none !important;
-        }
-        .mt-1 {
-            margin-top: 6px;
-        }
-        .text-ellipsis {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .hidden { display: none !important; }
+        .mt-1 { margin-top: 6px; }
+        .text-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     </style>
 </head>
 <body>
+<div class="app-container" id="app">
 
-    <div class="app-container" id="app">
+    <!-- HEADER -->
+    <div class="header">
+        <span class="icon">📺</span>
+        <h1>M3U8 Live Viewer</h1>
+        <span class="badge">HLS · .m3u8</span>
+    </div>
 
-        <!-- HEADER -->
-        <div class="header">
-            <span class="icon">📺</span>
-            <h1>M3U8 Live Viewer</h1>
-            <span class="badge">HLS · .m3u8</span>
+    <!-- SERVER PRESET BUTTONS -->
+    <div class="server-row">
+        <span class="server-label">Servers</span>
+        <button class="btn-server" data-server="1" id="serverBtn1">
+            <span class="server-dot"></span> Server 1
+        </button>
+        <button class="btn-server" data-server="2" id="serverBtn2">
+            <span class="server-dot"></span> Server 2
+        </button>
+    </div>
+
+    <!-- URL INPUT -->
+    <div class="url-section">
+        <div class="url-input-wrapper">
+            <input type="text" id="urlInput" placeholder="Paste your .m3u8 URL here…" spellcheck="false" autofocus />
         </div>
+        <button class="btn btn-primary" id="loadBtn">
+            <span>▶</span> Load &amp; Play
+        </button>
+        <button class="btn btn-secondary" id="saveBtn">
+            <span>💾</span> Save Link
+        </button>
+    </div>
 
-        <!-- URL INPUT -->
-        <div class="url-section">
-            <div class="url-input-wrapper">
-                <input
-                type="text"
-                id="urlInput"
-                placeholder="Paste your .m3u8 URL here…"
-                spellcheck="false"
-                autofocus
-                />
-            </div>
-            <button class="btn btn-primary" id="loadBtn">
-                <span>▶</span> Load &amp; Play
-            </button>
-            <button class="btn btn-secondary" id="saveBtn">
-                <span>💾</span> Save Link
-            </button>
+    <!-- ACTION ROW -->
+    <div class="action-row">
+        <div class="status-badge" id="statusBadge">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusText">Ready</span>
         </div>
-
-        <!-- ACTION ROW -->
-        <div class="action-row">
-            <div class="status-badge" id="statusBadge">
-                <span class="dot" id="statusDot"></span>
-                <span id="statusText">Ready</span>
-            </div>
-
-            <div class="saved-link-hint" id="savedHint">
-                <span class="link-icon">🔗</span>
-                <span id="savedLinkDisplay">No saved link</span>
-            </div>
-
-            <button class="btn btn-success btn-sm" id="showSavedBtn">
-                <span>📂</span> Show Saved
-            </button>
+        <div class="saved-link-hint" id="savedHint">
+            <span class="link-icon">🔗</span>
+            <span id="savedLinkDisplay">No saved link</span>
         </div>
+        <button class="btn btn-success btn-sm" id="showSavedBtn">
+            <span>📂</span> Show Saved
+        </button>
+    </div>
 
-        <!-- VIDEO PLAYER -->
-        <div class="player-wrapper" id="playerWrapper">
-            <video id="videoPlayer" controls playsinline preload="metadata"></video>
-            <div class="player-placeholder" id="placeholderOverlay">
-                <div class="big-icon">🎬</div>
-                <div>Enter an M3U8 URL above</div>
-                <div class="sub">Supports HLS live streams · .m3u8</div>
-            </div>
-        </div>
-
-        <!-- SAVED LINKS -->
-        <div class="saved-links-section">
-            <div class="saved-links-header">
-                <h3>
-                    📋 Saved Links
-                    <span id="savedCount">0</span>
-                </h3>
-                <button class="btn btn-secondary btn-sm" id="clearSavedBtn">
-                    Clear All
-                </button>
-            </div>
-            <div class="saved-links-list" id="savedLinksList">
-                <div class="empty-links-msg">No saved links yet.</div>
-            </div>
+    <!-- VIDEO PLAYER -->
+    <div class="player-wrapper" id="playerWrapper">
+        <video id="videoPlayer" controls playsinline preload="metadata"></video>
+        <div class="player-placeholder" id="placeholderOverlay">
+            <div class="big-icon">🎬</div>
+            <div>Select a server or enter an M3U8 URL</div>
+            <div class="sub">Supports HLS live streams · .m3u8</div>
         </div>
     </div>
 
-    <script>
-        (function() {
-            'use strict';
+    <!-- SAVED LINKS -->
+    <div class="saved-links-section">
+        <div class="saved-links-header">
+            <h3>📋 Saved Links <span id="savedCount">0</span></h3>
+            <button class="btn btn-secondary btn-sm" id="clearSavedBtn">Clear All</button>
+        </div>
+        <div class="saved-links-list" id="savedLinksList">
+            <div class="empty-links-msg">No saved links yet.</div>
+        </div>
+    </div>
+</div>
 
-            // ─── DOM refs ──────────────────────────────────────────────
-            const urlInput = document.getElementById('urlInput');
-            const loadBtn = document.getElementById('loadBtn');
-            const saveBtn = document.getElementById('saveBtn');
-            const showSavedBtn = document.getElementById('showSavedBtn');
-            const clearSavedBtn = document.getElementById('clearSavedBtn');
-            const videoEl = document.getElementById('videoPlayer');
-            const placeholder = document.getElementById('placeholderOverlay');
-            const playerWrapper = document.getElementById('playerWrapper');
+<script>
+(function() {
+    'use strict';
 
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            const savedLinkDisplay = document.getElementById('savedLinkDisplay');
-            const savedLinksList = document.getElementById('savedLinksList');
-            const savedCount = document.getElementById('savedCount');
+    // ─── Server presets ──────────────────────────────────────────────
+    const SERVER_PRESETS = {
+        1: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_1750.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P',
+        2: '', // Add Server 2 URL here
+    };
 
-            // ─── state ──────────────────────────────────────────────────
-            const STORAGE_KEY = 'm3u8_viewer_saved_links';
-            const DEFAULT_URL =
-                '';
+    // ─── DOM refs ──────────────────────────────────────────────────────
+    const urlInput       = document.getElementById('urlInput');
+    const loadBtn        = document.getElementById('loadBtn');
+    const saveBtn        = document.getElementById('saveBtn');
+    const showSavedBtn   = document.getElementById('showSavedBtn');
+    const clearSavedBtn  = document.getElementById('clearSavedBtn');
+    const videoEl        = document.getElementById('videoPlayer');
+    const placeholder    = document.getElementById('placeholderOverlay');
+    const playerWrapper  = document.getElementById('playerWrapper');
+    const statusDot      = document.getElementById('statusDot');
+    const statusText     = document.getElementById('statusText');
+    const savedLinkDisplay = document.getElementById('savedLinkDisplay');
+    const savedLinksList = document.getElementById('savedLinksList');
+    const savedCount     = document.getElementById('savedCount');
+    const serverBtn1     = document.getElementById('serverBtn1');
+    const serverBtn2     = document.getElementById('serverBtn2');
 
-            let savedLinks = [];
-            let hlsInstance = null;
-            let currentUrl = '';
+    const STORAGE_KEY = 'm3u8_viewer_saved_links';
+    let savedLinks   = [];
+    let hlsInstance  = null;
+    let currentUrl   = '';
+    let activeServer = null;
 
-            // ─── helpers ──────────────────────────────────────────────
+    // ─── helpers ──────────────────────────────────────────────────────
 
-            function loadSavedFromStorage() {
-                try {
-                    const data = localStorage.getItem(STORAGE_KEY);
-                    if (data) {
-                        const parsed = JSON.parse(data);
-                        if (Array.isArray(parsed)) {
-                            savedLinks = parsed;
-                            return;
-                        }
-                    }
-                } catch (_) { /* ignore */ }
-                savedLinks = [];
+    function loadSavedFromStorage() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                const parsed = JSON.parse(data);
+                if (Array.isArray(parsed)) { savedLinks = parsed; return; }
             }
+        } catch (_) {}
+        savedLinks = [];
+    }
 
-            function persistSaved() {
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedLinks));
-                } catch (_) { /* ignore */ }
-                renderSavedLinks();
-            }
+    function persistSaved() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(savedLinks)); } catch (_) {}
+        renderSavedLinks();
+    }
 
-            function setStatus(text, isActive = false, isError = false) {
-                statusText.textContent = text;
-                statusDot.className = 'dot';
-                if (isError) {
-                    statusDot.classList.add('error');
-                    statusDot.style.background = '#f06767';
-                    statusDot.style.boxShadow = '0 0 12px rgba(240,103,103,0.35)';
-                } else if (isActive) {
-                    statusDot.classList.add('active');
-                    statusDot.style.background = '#3be08b';
-                    statusDot.style.boxShadow = '0 0 12px rgba(59,224,139,0.4)';
-                } else {
-                    statusDot.style.background = '#4f5a6e';
-                    statusDot.style.boxShadow = 'none';
-                }
-            }
+    function setStatus(text, isActive = false, isError = false) {
+        statusText.textContent = text;
+        statusDot.className = 'dot';
+        if (isError) {
+            statusDot.style.background = '#f06767';
+            statusDot.style.boxShadow  = '0 0 12px rgba(240,103,103,0.35)';
+        } else if (isActive) {
+            statusDot.classList.add('active');
+            statusDot.style.background = '#3be08b';
+            statusDot.style.boxShadow  = '0 0 12px rgba(59,224,139,0.4)';
+        } else {
+            statusDot.style.background = '#4f5a6e';
+            statusDot.style.boxShadow  = 'none';
+        }
+    }
 
-            function updateSavedHint() {
-                if (savedLinks.length === 0) {
-                    savedLinkDisplay.textContent = 'No saved link';
-                    return;
-                }
-                // show the most recent saved link
-                const last = savedLinks[savedLinks.length - 1];
-                savedLinkDisplay.textContent = last.length > 60 ? last.slice(0, 58) + '…' : last;
-                savedLinkDisplay.title = last;
-            }
+    function setActiveServer(num) {
+        activeServer = num;
+        [serverBtn1, serverBtn2].forEach((btn, i) => {
+            btn.classList.toggle('active', (i + 1) === num);
+        });
+    }
 
-            function renderSavedLinks() {
-                const list = savedLinksList;
-                list.innerHTML = '';
+    function clearActiveServer() {
+        activeServer = null;
+        serverBtn1.classList.remove('active');
+        serverBtn2.classList.remove('active');
+    }
 
-                if (savedLinks.length === 0) {
-                    list.innerHTML = '<div class="empty-links-msg">No saved links yet.</div>';
-                    savedCount.textContent = '0';
-                    updateSavedHint();
-                    return;
-                }
+    function updateSavedHint() {
+        if (savedLinks.length === 0) { savedLinkDisplay.textContent = 'No saved link'; return; }
+        const last = savedLinks[savedLinks.length - 1];
+        savedLinkDisplay.textContent = last.length > 60 ? last.slice(0, 58) + '…' : last;
+        savedLinkDisplay.title = last;
+    }
 
-                savedCount.textContent = savedLinks.length;
-                updateSavedHint();
+    function renderSavedLinks() {
+        const list = savedLinksList;
+        list.innerHTML = '';
+        if (savedLinks.length === 0) {
+            list.innerHTML = '<div class="empty-links-msg">No saved links yet.</div>';
+            savedCount.textContent = '0';
+            updateSavedHint();
+            return;
+        }
+        savedCount.textContent = savedLinks.length;
+        updateSavedHint();
+        savedLinks.forEach((link, index) => {
+            const chip = document.createElement('div');
+            chip.className = 'saved-link-chip';
+            chip.title = link;
 
-                savedLinks.forEach((link, index) => {
-                    const chip = document.createElement('div');
-                    chip.className = 'saved-link-chip';
-                    chip.title = link;
+            const idxSpan = document.createElement('span');
+            idxSpan.className = 'chip-index';
+            idxSpan.textContent = `#${index + 1}`;
 
-                    const idxSpan = document.createElement('span');
-                    idxSpan.className = 'chip-index';
-                    idxSpan.textContent = `#${index + 1}`;
+            const textSpan = document.createElement('span');
+            textSpan.className = 'text-ellipsis';
+            textSpan.textContent = link.length > 50 ? link.slice(0, 48) + '…' : link;
+            textSpan.style.flex = '1';
 
-                    const textSpan = document.createElement('span');
-                    textSpan.className = 'text-ellipsis';
-                    textSpan.textContent = link.length > 50 ? link.slice(0, 48) + '…' : link;
-                    textSpan.style.flex = '1';
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = '✕';
+            removeBtn.setAttribute('aria-label', 'Remove link');
 
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'remove-btn';
-                    removeBtn.textContent = '✕';
-                    removeBtn.setAttribute('aria-label', 'Remove link');
+            chip.appendChild(idxSpan);
+            chip.appendChild(textSpan);
+            chip.appendChild(removeBtn);
 
-                    chip.appendChild(idxSpan);
-                    chip.appendChild(textSpan);
-                    chip.appendChild(removeBtn);
-
-                    // click chip → load that URL
-                    chip.addEventListener('click', (e) => {
-                        if (e.target === removeBtn) return;
-                        urlInput.value = link;
-                        loadUrl(link);
-                    });
-
-                    // remove button
-                    removeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        savedLinks.splice(index, 1);
-                        persistSaved();
-                        if (savedLinks.length === 0) {
-                            savedLinkDisplay.textContent = 'No saved link';
-                        } else {
-                            updateSavedHint();
-                        }
-                        // if the current URL was removed, reset hint
-                        if (currentUrl === link && savedLinks.length > 0) {
-                            // keep showing the last one
-                        }
-                    });
-
-                    list.appendChild(chip);
-                });
-            }
-
-            // ─── video / HLS ──────────────────────────────────────────
-
-            function destroyHls() {
-                if (hlsInstance) {
-                    try {
-                        hlsInstance.destroy();
-                    } catch (_) { /* ignore */ }
-                    hlsInstance = null;
-                }
-                // detach media to be safe
-                if (videoEl) {
-                    videoEl.removeAttribute('src');
-                    videoEl.load();
-                }
-            }
-
-            function loadUrl(url) {
-                if (!url || !url.trim()) {
-                    setStatus('Please enter a URL', false, true);
-                    return;
-                }
-
-                const trimmed = url.trim();
-                // basic check
-                if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
-                    setStatus('Invalid URL (must start with http:// or https://)', false, true);
-                    return;
-                }
-
-                // if it doesn't end with .m3u8, we still allow it (some streams may not have .m3u8 in path)
-                // but we warn
-                if (!trimmed.includes('.m3u8')) {
-                    setStatus('Warning: URL does not contain .m3u8 — trying anyway…', false);
-                }
-
-                currentUrl = trimmed;
-                urlInput.value = trimmed;
-
-                // show placeholder with loading state
-                placeholder.classList.remove('hidden');
-                placeholder.querySelector('.big-icon').textContent = '⏳';
-                placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent = 'Loading stream…';
-                placeholder.querySelector('.sub').textContent = 'Please wait';
-                playerWrapper.classList.add('loading');
-                setStatus('Loading…', true);
-
-                // destroy previous HLS
-                destroyHls();
-
-                // if native HLS supported (Safari), use it
-                if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
-                    videoEl.src = trimmed;
-                    videoEl.play().catch((err) => {
-                        console.warn('Native playback error:', err);
-                        setStatus('Native HLS error — try another browser', false, true);
-                        placeholder.classList.remove('hidden');
-                        playerWrapper.classList.remove('loading');
-                        placeholder.querySelector('.big-icon').textContent = '⚠️';
-                        placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                        'Playback error';
-                        placeholder.querySelector('.sub').textContent = err.message || 'Unknown error';
-                    });
-                    videoEl.addEventListener('loadedmetadata', () => {
-                        placeholder.classList.add('hidden');
-                        playerWrapper.classList.remove('loading');
-                        setStatus('Playing (native HLS)', true);
-                    });
-                    videoEl.addEventListener('error', () => {
-                        setStatus('Native HLS error', false, true);
-                        placeholder.classList.remove('hidden');
-                        playerWrapper.classList.remove('loading');
-                        placeholder.querySelector('.big-icon').textContent = '❌';
-                        placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                            'Playback failed';
-                        placeholder.querySelector('.sub').textContent =
-                        'Check the URL or try a different browser';
-                    });
-                    return;
-                }
-
-                // ── use hls.js ──
-                if (!Hls.isSupported()) {
-                    setStatus('HLS not supported in this browser', false, true);
-                    placeholder.querySelector('.big-icon').textContent = '🚫';
-                    placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                    'HLS not supported';
-                    placeholder.querySelector('.sub').textContent =
-                    'Please use a modern browser (Chrome, Edge, Firefox)';
-                    playerWrapper.classList.remove('loading');
-                    return;
-                }
-
-                const hls = new Hls({
-                    enableWorker: true,
-                    lowLatencyMode: true,
-                    backbufferLength: 30,
-                });
-
-                hlsInstance = hls;
-
-                hls.attachMedia(videoEl);
-
-                hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-                    hls.loadSource(trimmed);
-                    setStatus('Loading source…', true);
-                });
-
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    placeholder.classList.add('hidden');
-                    playerWrapper.classList.remove('loading');
-                    setStatus('Playing (HLS.js)', true);
-                    videoEl.play().catch((err) => {
-                        // autoplay blocked — user can click play
-                        console.warn('Autoplay blocked:', err);
-                        setStatus('Ready — click play', true);
-                    });
-                });
-
-                hls.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        setStatus('Fatal HLS error', false, true);
-                        placeholder.classList.remove('hidden');
-                        playerWrapper.classList.remove('loading');
-                        placeholder.querySelector('.big-icon').textContent = '❌';
-                        placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                            'Stream error';
-                        placeholder.querySelector('.sub').textContent =
-                            data.details || 'Could not load stream';
-                        // attempt recovery?
-                        if (hlsInstance) {
-                            hlsInstance.destroy();
-                            hlsInstance = null;
-                        }
-                    } else {
-                        // non-fatal
-                        setStatus('HLS warning: ' + (data.details || ''), false);
-                    }
-                });
-
-                // if loading takes too long, show a message
-                const timeout = setTimeout(() => {
-                    if (!placeholder.classList.contains('hidden')) {
-                        placeholder.querySelector('.sub').textContent =
-                            'Still loading… check your connection';
-                    }
-                }, 8000);
-
-                // clear timeout on success
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    clearTimeout(timeout);
-                });
-
-                hls.on(Hls.Events.ERROR, () => {
-                    clearTimeout(timeout);
-                });
-            }
-
-            // ─── save link ─────────────────────────────────────────────
-
-            function saveCurrentUrl() {
-                const url = urlInput.value.trim();
-                if (!url) {
-                    setStatus('Nothing to save — enter a URL first', false, true);
-                    return;
-                }
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    setStatus('Invalid URL — must start with http:// or https://', false, true);
-                    return;
-                }
-                // avoid duplicates (case-insensitive)
-                const exists = savedLinks.some(
-                    (l) => l.toLowerCase() === url.toLowerCase()
-                );
-                if (exists) {
-                    setStatus('Link already saved ✓', false);
-                    return;
-                }
-
-                savedLinks.push(url);
+            chip.addEventListener('click', (e) => {
+                if (e.target === removeBtn) return;
+                urlInput.value = link;
+                clearActiveServer();
+                loadUrl(link);
+            });
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                savedLinks.splice(index, 1);
                 persistSaved();
-                setStatus('Link saved ✓', false);
-                // update hint
-                updateSavedHint();
-                // show the saved link briefly
-                savedLinkDisplay.textContent = url.length > 60 ? url.slice(0, 58) + '…' : url;
-                savedLinkDisplay.title = url;
+                if (savedLinks.length === 0) savedLinkDisplay.textContent = 'No saved link';
+                else updateSavedHint();
+            });
+            list.appendChild(chip);
+        });
+    }
+
+    // ─── video / HLS ──────────────────────────────────────────────────
+
+    function destroyHls() {
+        if (hlsInstance) {
+            try { hlsInstance.destroy(); } catch (_) {}
+            hlsInstance = null;
+        }
+        if (videoEl) { videoEl.removeAttribute('src'); videoEl.load(); }
+    }
+
+    function setPlaceholder(icon, msg, sub) {
+        placeholder.querySelector('.big-icon').textContent = icon;
+        placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent = msg;
+        placeholder.querySelector('.sub').textContent = sub;
+    }
+
+    function loadUrl(url) {
+        if (!url || !url.trim()) { setStatus('Please enter a URL', false, true); return; }
+        const trimmed = url.trim();
+        if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+            setStatus('Invalid URL (must start with http:// or https://)', false, true); return;
+        }
+        if (!trimmed.includes('.m3u8')) {
+            setStatus('Warning: URL does not contain .m3u8 — trying anyway…', false);
+        }
+        currentUrl = trimmed;
+        urlInput.value = trimmed;
+
+        placeholder.classList.remove('hidden');
+        setPlaceholder('⏳', 'Loading stream…', 'Please wait');
+        playerWrapper.classList.add('loading');
+        setStatus('Loading…', true);
+
+        destroyHls();
+
+        if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+            videoEl.src = trimmed;
+            videoEl.play().catch((err) => {
+                setStatus('Native HLS error — try another browser', false, true);
+                placeholder.classList.remove('hidden');
+                playerWrapper.classList.remove('loading');
+                setPlaceholder('⚠️', 'Playback error', err.message || 'Unknown error');
+            });
+            videoEl.addEventListener('loadedmetadata', () => {
+                placeholder.classList.add('hidden');
+                playerWrapper.classList.remove('loading');
+                setStatus('Playing (native HLS)', true);
+            });
+            videoEl.addEventListener('error', () => {
+                setStatus('Native HLS error', false, true);
+                placeholder.classList.remove('hidden');
+                playerWrapper.classList.remove('loading');
+                setPlaceholder('❌', 'Playback failed', 'Check the URL or try a different browser');
+            });
+            return;
+        }
+
+        if (!Hls.isSupported()) {
+            setStatus('HLS not supported in this browser', false, true);
+            setPlaceholder('🚫', 'HLS not supported', 'Please use a modern browser (Chrome, Edge, Firefox)');
+            playerWrapper.classList.remove('loading');
+            return;
+        }
+
+        const hls = new Hls({ enableWorker: true, lowLatencyMode: true, backbufferLength: 30 });
+        hlsInstance = hls;
+        hls.attachMedia(videoEl);
+
+        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            hls.loadSource(trimmed);
+            setStatus('Loading source…', true);
+        });
+
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            placeholder.classList.add('hidden');
+            playerWrapper.classList.remove('loading');
+            setStatus('Playing (HLS.js)', true);
+            clearTimeout(timeout);
+            videoEl.play().catch(() => setStatus('Ready — click play', true));
+        });
+
+        hls.on(Hls.Events.ERROR, (event, data) => {
+            clearTimeout(timeout);
+            if (data.fatal) {
+                setStatus('Fatal HLS error', false, true);
+                placeholder.classList.remove('hidden');
+                playerWrapper.classList.remove('loading');
+                setPlaceholder('❌', 'Stream error', data.details || 'Could not load stream');
+                if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+            } else {
+                setStatus('HLS warning: ' + (data.details || ''), false);
             }
+        });
 
-            // ─── show saved link ──────────────────────────────────────
-
-            function showSavedLink() {
-                if (savedLinks.length === 0) {
-                    setStatus('No saved links to show', false, true);
-                    return;
-                }
-                const last = savedLinks[savedLinks.length - 1];
-                urlInput.value = last;
-                loadUrl(last);
-                // highlight the chip
-                const chips = savedLinksList.querySelectorAll('.saved-link-chip');
-                if (chips.length > 0) {
-                    const lastChip = chips[chips.length - 1];
-                    lastChip.style.borderColor = '#5a7bcf';
-                    lastChip.style.background = '#1a2740';
-                    setTimeout(() => {
-                        lastChip.style.borderColor = '#26303f';
-                        lastChip.style.background = '#121a24';
-                    }, 1500);
-                }
-                setStatus('Loaded saved link', true);
+        const timeout = setTimeout(() => {
+            if (!placeholder.classList.contains('hidden')) {
+                placeholder.querySelector('.sub').textContent = 'Still loading… check your connection';
             }
+        }, 8000);
+    }
 
-            // ─── clear all ─────────────────────────────────────────────
+    // ─── save link ────────────────────────────────────────────────────
 
-            function clearAllSaved() {
-                if (savedLinks.length === 0) return;
-                if (confirm('Delete all saved links?')) {
-                    savedLinks = [];
-                    persistSaved();
-                    savedLinkDisplay.textContent = 'No saved link';
-                    setStatus('Cleared all links', false);
-                }
+    function saveCurrentUrl() {
+        const url = urlInput.value.trim();
+        if (!url) { setStatus('Nothing to save — enter a URL first', false, true); return; }
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            setStatus('Invalid URL — must start with http:// or https://', false, true); return;
+        }
+        if (savedLinks.some(l => l.toLowerCase() === url.toLowerCase())) {
+            setStatus('Link already saved ✓', false); return;
+        }
+        savedLinks.push(url);
+        persistSaved();
+        setStatus('Link saved ✓', false);
+        updateSavedHint();
+        savedLinkDisplay.textContent = url.length > 60 ? url.slice(0, 58) + '…' : url;
+        savedLinkDisplay.title = url;
+    }
+
+    function showSavedLink() {
+        if (savedLinks.length === 0) { setStatus('No saved links to show', false, true); return; }
+        const last = savedLinks[savedLinks.length - 1];
+        urlInput.value = last;
+        clearActiveServer();
+        loadUrl(last);
+        const chips = savedLinksList.querySelectorAll('.saved-link-chip');
+        if (chips.length > 0) {
+            const lastChip = chips[chips.length - 1];
+            lastChip.style.borderColor = '#5a7bcf';
+            lastChip.style.background  = '#1a2740';
+            setTimeout(() => {
+                lastChip.style.borderColor = '#26303f';
+                lastChip.style.background  = '#121a24';
+            }, 1500);
+        }
+        setStatus('Loaded saved link', true);
+    }
+
+    function clearAllSaved() {
+        if (savedLinks.length === 0) return;
+        if (confirm('Delete all saved links?')) {
+            savedLinks = [];
+            persistSaved();
+            savedLinkDisplay.textContent = 'No saved link';
+            setStatus('Cleared all links', false);
+        }
+    }
+
+    // ─── init ─────────────────────────────────────────────────────────
+
+    function init() {
+        loadSavedFromStorage();
+        renderSavedLinks();
+
+        if (savedLinks.length > 0) updateSavedHint();
+        else savedLinkDisplay.textContent = 'No saved link';
+
+        // Server preset buttons
+        serverBtn1.addEventListener('click', () => {
+            const url = SERVER_PRESETS[1];
+            if (!url) { setStatus('Server 1 URL not configured', false, true); return; }
+            setActiveServer(1);
+            urlInput.value = url;
+            loadUrl(url);
+        });
+
+        serverBtn2.addEventListener('click', () => {
+            const url = SERVER_PRESETS[2];
+            if (!url) { setStatus('Server 2 URL not configured yet', false, true); return; }
+            setActiveServer(2);
+            urlInput.value = url;
+            loadUrl(url);
+        });
+
+        loadBtn.addEventListener('click', () => {
+            const val = urlInput.value.trim();
+            if (val) { clearActiveServer(); loadUrl(val); }
+            else setStatus('Please enter a URL', false, true);
+        });
+
+        saveBtn.addEventListener('click', saveCurrentUrl);
+        showSavedBtn.addEventListener('click', showSavedLink);
+        clearSavedBtn.addEventListener('click', clearAllSaved);
+
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const val = urlInput.value.trim();
+                if (val) { clearActiveServer(); loadUrl(val); }
+                else setStatus('Please enter a URL', false, true);
             }
+        });
 
-            // ─── init ──────────────────────────────────────────────────
+        // Clear active server if user manually edits URL
+        urlInput.addEventListener('input', () => {
+            if (activeServer !== null) clearActiveServer();
+        });
 
-            function init() {
-                loadSavedFromStorage();
-                renderSavedLinks();
+        videoEl.addEventListener('play', () => {
+            placeholder.classList.add('hidden');
+            playerWrapper.classList.remove('loading');
+            setStatus('Playing', true);
+        });
+        videoEl.addEventListener('pause', () => {
+            if (!videoEl.src) return;
+            setStatus('Paused', false);
+        });
+        videoEl.addEventListener('ended', () => setStatus('Stream ended', false));
+        videoEl.addEventListener('error', () => {
+            if (videoEl.error) setStatus('Video error: ' + (videoEl.error.message || ''), false, true);
+        });
 
-                // pre-fill default URL
-                urlInput.value = DEFAULT_URL;
+        setStatus('Ready — select a server or enter a URL');
+    }
 
-                // if there are saved links, show the latest in hint
-                if (savedLinks.length > 0) {
-                    updateSavedHint();
-                } else {
-                    savedLinkDisplay.textContent = 'No saved link';
-                }
-
-                // ── event listeners ──
-
-                loadBtn.addEventListener('click', () => {
-                    const val = urlInput.value.trim();
-                    if (val) {
-                        loadUrl(val);
-                    } else {
-                        setStatus('Please enter a URL', false, true);
-                    }
-                });
-
-                saveBtn.addEventListener('click', saveCurrentUrl);
-
-                showSavedBtn.addEventListener('click', showSavedLink);
-
-                clearSavedBtn.addEventListener('click', clearAllSaved);
-
-                // Enter key on input
-                urlInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = urlInput.value.trim();
-                        if (val) {
-                            loadUrl(val);
-                        } else {
-                            setStatus('Please enter a URL', false, true);
-                        }
-                    }
-                });
-
-                // if video is clicked / played, hide placeholder
-                videoEl.addEventListener('play', () => {
-                    placeholder.classList.add('hidden');
-                    playerWrapper.classList.remove('loading');
-                    setStatus('Playing', true);
-                });
-
-                videoEl.addEventListener('pause', () => {
-                    if (!videoEl.src) return;
-                    setStatus('Paused', false);
-                });
-
-                // if the video ends (live streams usually don't)
-                videoEl.addEventListener('ended', () => {
-                    setStatus('Stream ended', false);
-                });
-
-                // handle errors from native playback
-                videoEl.addEventListener('error', (e) => {
-                    if (videoEl.error) {
-                        setStatus('Video error: ' + (videoEl.error.message || ''), false, true);
-                    }
-                });
-
-                // set initial status
-                setStatus('Ready — enter a URL');
-            }
-
-            // ─── start ──────────────────────────────────────────────────
-            init();
-        })();
-    </script>
-
+    init();
+})();
+</script>
 </body>
 </html>
