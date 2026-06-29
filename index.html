@@ -4,55 +4,62 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>M3U8 Live Stream Viewer</title>
-
-    <!-- hls.js for HLS playback -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@0.14.17/dist/hls.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@0.14.17/dist/hls.min.js"></script>
 
     <style>
-        /* ───────────── full-screen reset ───────────── */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
+        html, body {
+            width: 100%; height: 100%;
             overflow: hidden;
             background: #0b0d11;
             color: #e8edf5;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
         }
 
-        /* ───────────── container ───────────── */
         .app-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
             width: 100%;
-            padding: 20px 24px 24px 24px;
             background: #0b0d11;
-            gap: 14px;
+            position: relative;
         }
 
-        /* ───────────── header ───────────── */
+        /* ── OVERLAY UI (header + servers + status) ── */
+        .overlay-ui {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            z-index: 10;
+            padding: 16px 20px 20px;
+            background: linear-gradient(to bottom, rgba(8,11,16,0.92) 0%, rgba(8,11,16,0.6) 70%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            /* hide/show */
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .overlay-ui.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* header */
         .header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
+            gap: 10px;
         }
 
-        .header .icon {
-            font-size: 28px;
-            line-height: 1;
-        }
+        .header .icon { font-size: 22px; line-height: 1; }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
             letter-spacing: -0.3px;
             background: linear-gradient(135deg, #f0f4ff 0%, #94b0ff 100%);
@@ -63,27 +70,22 @@
 
         .header .badge {
             margin-left: auto;
-            font-size: 12px;
+            font-size: 11px;
             background: #1f2a3a;
-            padding: 4px 14px;
+            padding: 3px 12px;
             border-radius: 100px;
             color: #9bb1d0;
             border: 1px solid #2d384a;
-            letter-spacing: 0.3px;
             flex-shrink: 0;
         }
 
-        /* ───────────── SERVER BUTTONS ───────────── */
-        .server-section {
-            flex-shrink: 0;
-        }
-
+        /* server section */
         .server-section .server-label {
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.6px;
             color: #6a7f9f;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -91,31 +93,30 @@
 
         .server-section .server-label .badge-servers {
             background: #1f2a3a;
-            font-size: 11px;
-            padding: 0 10px;
+            font-size: 10px;
+            padding: 0 8px;
             border-radius: 100px;
             color: #8fa2c4;
-            font-weight: 400;
-            letter-spacing: 0;
         }
 
         .server-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 7px;
         }
 
         .server-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 22px;
-            border-radius: 14px;
+            gap: 7px;
+            padding: 8px 18px;
+            border-radius: 12px;
             border: 1.5px solid #26303f;
-            background: #111a24;
+            background: rgba(17, 26, 36, 0.85);
+            backdrop-filter: blur(6px);
             color: #b0c4e0;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: inherit;
@@ -123,551 +124,515 @@
         }
 
         .server-btn:hover {
-            background: #1c283c;
+            background: rgba(28, 40, 60, 0.9);
             border-color: #3a4d6a;
             color: #fff;
             transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .server-btn:active {
-            transform: translateY(0px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
         .server-btn .server-status {
             display: none;
-            width: 8px;
-            height: 8px;
+            width: 7px; height: 7px;
             border-radius: 50%;
             background: #3be08b;
-            box-shadow: 0 0 12px rgba(59, 224, 139, 0.3);
+            box-shadow: 0 0 10px rgba(59,224,139,0.3);
         }
 
         .server-btn.active {
-            background: #1a2a44;
+            background: rgba(26, 42, 68, 0.9);
             border-color: #5a7bcf;
             color: #fff;
-            box-shadow: 0 0 0 3px rgba(74, 120, 255, 0.15), 0 4px 20px rgba(59, 108, 244, 0.15);
+            box-shadow: 0 0 0 3px rgba(74,120,255,0.15);
         }
 
-        .server-btn.active .server-status {
-            display: inline-block;
-        }
+        .server-btn.active .server-status { display: inline-block; }
 
         .server-btn .server-shortcut {
-            font-size: 11px;
+            font-size: 10px;
             color: #4f6180;
             font-weight: 400;
             opacity: 0.6;
         }
 
-        /* ───────────── status row ───────────── */
-        .action-row {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 2px;
-        }
-
-        .action-row .status-badge {
-            font-size: 13px;
+        /* status badge */
+        .status-badge {
+            font-size: 12px;
             color: #8fa2c4;
-            background: #151f2b;
-            padding: 6px 16px;
+            background: rgba(21,31,43,0.8);
+            backdrop-filter: blur(4px);
+            padding: 5px 14px;
             border-radius: 100px;
             border: 1px solid #26303f;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            align-self: flex-start;
         }
 
-        .action-row .status-badge .dot {
-            width: 8px;
-            height: 8px;
+        .status-badge .dot {
+            width: 7px; height: 7px;
             border-radius: 50%;
-            display: inline-block;
             background: #4f5a6e;
         }
 
-        .action-row .status-badge .dot.active {
+        .status-badge .dot.active {
             background: #3be08b;
-            box-shadow: 0 0 12px rgba(59, 224, 139, 0.4);
+            box-shadow: 0 0 10px rgba(59,224,139,0.4);
         }
 
-        .action-row .status-badge .dot.error {
+        .status-badge .dot.error {
             background: #f06767;
-            box-shadow: 0 0 12px rgba(240, 103, 103, 0.35);
+            box-shadow: 0 0 10px rgba(240,103,103,0.35);
         }
 
-        /* ───────────── video player (fills remaining space) ───────────── */
+        /* ── VIDEO (fills entire container) ── */
         .player-wrapper {
-            flex: 1;
-            min-height: 0;
-            border-radius: 18px;
-            overflow: hidden;
+            position: absolute;
+            inset: 0;
             background: #0a0e14;
-            position: relative;
-            border: 1px solid #212a36;
+            cursor: none;
         }
+
+        .player-wrapper.cursor-visible { cursor: default; }
 
         #videoPlayer {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             display: block;
             background: #080b10;
             object-fit: contain;
         }
 
-        /* placeholder overlay */
+        /* hide native controls */
+        #videoPlayer::-webkit-media-controls,
+        #videoPlayer::-webkit-media-controls-enclosure,
+        #videoPlayer::-webkit-media-controls-panel,
+        #videoPlayer::-webkit-media-controls-overlay-play-button,
+        #videoPlayer::-webkit-media-controls-start-playback-button { display: none !important; }
+
+        /* placeholder */
         .player-placeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            inset: 0;
             background: #0d121b;
             color: #3f4c62;
             font-size: 15px;
             gap: 12px;
-            padding: 30px;
             text-align: center;
             user-select: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            border-radius: 18px;
+            z-index: 2;
             pointer-events: none;
         }
 
-        .player-placeholder .big-icon {
-            font-size: 52px;
-            opacity: 0.5;
-        }
-
-        .player-placeholder .sub {
-            font-size: 13px;
-            color: #324053;
-        }
+        .player-placeholder .big-icon { font-size: 52px; opacity: 0.5; }
+        .player-placeholder .sub { font-size: 13px; color: #324053; }
 
         .player-wrapper.loading .player-placeholder .big-icon {
             animation: pulse 1.2s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%,
-            100% {
-                opacity: 0.4;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.9;
-                transform: scale(1.06);
-            }
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.06); }
         }
 
-        .hidden {
-            display: none !important;
+        .hidden { display: none !important; }
+
+        /* ── CUSTOM CONTROLS (bottom overlay) ── */
+        .custom-controls {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            z-index: 10;
+            padding: 20px 24px;
+            background: linear-gradient(to top, rgba(8,11,16,0.88) 0%, rgba(8,11,16,0.5) 60%, transparent 100%);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
         }
 
-        /* ───────────── responsive tweaks ───────────── */
+        .custom-controls.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .custom-controls button {
+            background: rgba(0,0,0,0.55);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(6px);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .custom-controls button:hover { background: rgba(255,255,255,0.18); }
+        .custom-controls button:active { transform: scale(0.9); }
+        .custom-controls button.muted { opacity: 0.6; }
+
+        /* responsive */
         @media (max-width: 720px) {
-            .app-container {
-                padding: 14px 16px 16px 16px;
-                gap: 12px;
-            }
-
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .server-btn {
-                padding: 8px 16px;
-                font-size: 13px;
-            }
-
-            .server-btn .server-shortcut {
-                display: none;
-            }
-
-            .player-wrapper {
-                border-radius: 12px;
-            }
+            .overlay-ui { padding: 12px 14px 16px; }
+            .header h1 { font-size: 17px; }
+            .server-btn { padding: 6px 13px; font-size: 12px; }
+            .server-btn .server-shortcut { display: none; }
+            .custom-controls { padding: 14px 16px; }
+            .custom-controls button { width: 38px; height: 38px; font-size: 17px; }
         }
 
         @media (max-width: 440px) {
-            .header .badge {
-                display: none;
-            }
-
-            .server-btn {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
+            .header .badge { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="app">
+<div class="app-container" id="app">
 
-        <!-- HEADER -->
+    <!-- VIDEO (full-screen base layer) -->
+    <div class="player-wrapper" id="playerWrapper">
+        <video id="videoPlayer" playsinline preload="metadata"></video>
+
+        <div class="player-placeholder" id="placeholderOverlay">
+            <div class="big-icon">🎬</div>
+            <div>Select a server to start</div>
+            <div class="sub">HLS live streams · .m3u8</div>
+        </div>
+
+        <!-- bottom controls -->
+        <div class="custom-controls" id="customControls">
+            <button id="muteBtn" title="Mute / Unmute" aria-label="Toggle mute">🔊</button>
+            <button id="fullscreenBtn" title="Fullscreen" aria-label="Toggle fullscreen">⛶</button>
+        </div>
+    </div>
+
+    <!-- TOP OVERLAY (header + servers + status) -->
+    <div class="overlay-ui" id="overlayUi">
         <div class="header">
             <span class="icon">📺</span>
             <h1>M3U8 Live Viewer</h1>
             <span class="badge">HLS · .m3u8</span>
         </div>
 
-        <!-- ─── SERVER BUTTONS ─── -->
         <div class="server-section" id="serverSection">
             <div class="server-label">
                 <span>🖥️ Servers</span>
                 <span class="badge-servers" id="serverCount">0</span>
-                <span style="font-weight:400;font-size:11px;color:#4f6180;margin-left:4px;">
-                    — click to load stream
-                </span>
+                <span style="font-weight:400;font-size:10px;color:#4f6180;margin-left:4px;">— click to load</span>
             </div>
-            <div class="server-buttons" id="serverButtons">
-                <!-- rendered by JS -->
-            </div>
+            <div class="server-buttons" id="serverButtons"></div>
         </div>
 
-        <!-- STATUS ROW -->
-        <div class="action-row">
-            <div class="status-badge" id="statusBadge">
-                <span class="dot" id="statusDot"></span>
-                <span id="statusText">Ready</span>
-            </div>
+        <div class="status-badge" id="statusBadge">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusText">Ready</span>
         </div>
-
-        <!-- VIDEO PLAYER (fills remaining height) -->
-        <div class="player-wrapper" id="playerWrapper">
-            <video id="videoPlayer" controls playsinline preload="metadata"></video>
-            <div class="player-placeholder" id="placeholderOverlay">
-                <div class="big-icon">🎬</div>
-                <div>Select a server to start</div>
-                <div class="sub">HLS live streams · .m3u8</div>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        (function() {
-            'use strict';
+</div>
 
-            // ─── DOM refs ──────────────────────────────────────────────
-            const videoEl = document.getElementById('videoPlayer');
-            const placeholder = document.getElementById('placeholderOverlay');
-            const playerWrapper = document.getElementById('playerWrapper');
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            const serverButtons = document.getElementById('serverButtons');
-            const serverCount = document.getElementById('serverCount');
+<script>
+(function () {
+    'use strict';
 
-            // ─── state ──────────────────────────────────────────────────
-            const SERVERS_STORAGE_KEY = 'm3u8_viewer_servers';
+    const videoEl        = document.getElementById('videoPlayer');
+    const placeholder    = document.getElementById('placeholderOverlay');
+    const playerWrapper  = document.getElementById('playerWrapper');
+    const statusDot      = document.getElementById('statusDot');
+    const statusText     = document.getElementById('statusText');
+    const serverButtons  = document.getElementById('serverButtons');
+    const serverCount    = document.getElementById('serverCount');
+    const muteBtn        = document.getElementById('muteBtn');
+    const fullscreenBtn  = document.getElementById('fullscreenBtn');
+    const customControls = document.getElementById('customControls');
+    const overlayUi      = document.getElementById('overlayUi');
 
-            const DEFAULT_SERVERS = [{
-                name: 'Server 1',
-                url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_1750.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P'
-            }, {
-                name: 'Server 2',
-                url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_1250.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P'
-            }, {
-                name: 'Server 3',
-                url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_750.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P'
-            }];
+    const SERVERS_STORAGE_KEY = 'm3u8_viewer_servers';
+    const HIDE_DELAY = 3000; // ms
 
-            let hlsInstance = null;
-            let servers = [];
-            let activeServerIndex = -1;
+    const DEFAULT_SERVERS = [
+        { name: 'Server 1', url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_1750.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P' },
+        { name: 'Server 2', url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_1250.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P' },
+        { name: 'Server 3', url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_750.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P' },
+    ];
 
-            // ─── helpers ──────────────────────────────────────────────
+    let hlsInstance      = null;
+    let servers          = [];
+    let activeServerIndex = -1;
 
-            function loadServersFromStorage() {
-                try {
-                    const data = localStorage.getItem(SERVERS_STORAGE_KEY);
-                    if (data) {
-                        const parsed = JSON.parse(data);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            servers = parsed;
-                            return;
-                        }
-                    }
-                } catch (_) { /* ignore */ }
-                servers = JSON.parse(JSON.stringify(DEFAULT_SERVERS));
+    // ── unified hide timer ────────────────────────────────────
+    let hideTimer = null;
+
+    function showUI() {
+        overlayUi.classList.add('visible');
+        customControls.classList.add('visible');
+        playerWrapper.classList.add('cursor-visible');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(hideUI, HIDE_DELAY);
+    }
+
+    function hideUI() {
+        overlayUi.classList.remove('visible');
+        customControls.classList.remove('visible');
+        playerWrapper.classList.remove('cursor-visible');
+    }
+
+    function setupInteraction() {
+        const events = ['mousemove', 'click', 'touchstart', 'touchmove', 'keydown'];
+        events.forEach(evt => document.addEventListener(evt, showUI, { passive: true }));
+
+        // keep UI alive while hovering over the overlay itself
+        overlayUi.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+        overlayUi.addEventListener('mouseleave', () => {
+            hideTimer = setTimeout(hideUI, HIDE_DELAY);
+        });
+        customControls.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+        customControls.addEventListener('mouseleave', () => {
+            hideTimer = setTimeout(hideUI, HIDE_DELAY);
+        });
+    }
+
+    // ── status ────────────────────────────────────────────────
+    function setStatus(text, isActive = false, isError = false) {
+        statusText.textContent = text;
+        statusDot.className = 'dot';
+        if (isError) {
+            statusDot.classList.add('error');
+            statusDot.style.background = '#f06767';
+            statusDot.style.boxShadow = '0 0 12px rgba(240,103,103,0.35)';
+        } else if (isActive) {
+            statusDot.classList.add('active');
+            statusDot.style.background = '#3be08b';
+            statusDot.style.boxShadow = '0 0 12px rgba(59,224,139,0.4)';
+        } else {
+            statusDot.style.background = '#4f5a6e';
+            statusDot.style.boxShadow = 'none';
+        }
+    }
+
+    // ── servers ───────────────────────────────────────────────
+    function loadServersFromStorage() {
+        try {
+            const data = localStorage.getItem(SERVERS_STORAGE_KEY);
+            if (data) {
+                const parsed = JSON.parse(data);
+                if (Array.isArray(parsed) && parsed.length > 0) { servers = parsed; return; }
             }
+        } catch (_) {}
+        servers = JSON.parse(JSON.stringify(DEFAULT_SERVERS));
+    }
 
-            function persistServers() {
-                try {
-                    localStorage.setItem(SERVERS_STORAGE_KEY, JSON.stringify(servers));
-                } catch (_) { /* ignore */ }
-                renderServers();
-            }
+    function persistServers() {
+        try { localStorage.setItem(SERVERS_STORAGE_KEY, JSON.stringify(servers)); } catch (_) {}
+        renderServers();
+    }
 
-            function setStatus(text, isActive = false, isError = false) {
-                statusText.textContent = text;
-                statusDot.className = 'dot';
-                if (isError) {
-                    statusDot.classList.add('error');
-                    statusDot.style.background = '#f06767';
-                    statusDot.style.boxShadow = '0 0 12px rgba(240,103,103,0.35)';
-                } else if (isActive) {
-                    statusDot.classList.add('active');
-                    statusDot.style.background = '#3be08b';
-                    statusDot.style.boxShadow = '0 0 12px rgba(59,224,139,0.4)';
-                } else {
-                    statusDot.style.background = '#4f5a6e';
-                    statusDot.style.boxShadow = 'none';
+    function renderServers() {
+        serverButtons.innerHTML = '';
+        serverCount.textContent = servers.length;
+
+        servers.forEach((server, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'server-btn' + (idx === activeServerIndex ? ' active' : '');
+
+            const statusSpan   = document.createElement('span');
+            statusSpan.className = 'server-status';
+            const nameSpan     = document.createElement('span');
+            nameSpan.textContent = server.name;
+            const shortcutSpan = document.createElement('span');
+            shortcutSpan.className = 'server-shortcut';
+            shortcutSpan.textContent = `[${idx + 1}]`;
+
+            btn.appendChild(statusSpan);
+            btn.appendChild(nameSpan);
+            btn.appendChild(shortcutSpan);
+
+            btn.addEventListener('click', () => {
+                loadUrl(server.url);
+                setActiveServer(idx);
+                setStatus(`Loaded ${server.name}`, true);
+            });
+
+            btn.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (servers.length <= 1) { setStatus('Cannot remove the last server', false, true); return; }
+                if (confirm(`Remove "${server.name}"?`)) {
+                    servers.splice(idx, 1);
+                    if (activeServerIndex === idx) activeServerIndex = -1;
+                    else if (activeServerIndex > idx) activeServerIndex--;
+                    persistServers();
+                    setStatus(`Removed ${server.name}`, false);
                 }
+            });
+
+            serverButtons.appendChild(btn);
+        });
+    }
+
+    function setActiveServer(idx) {
+        activeServerIndex = idx;
+        serverButtons.querySelectorAll('.server-btn').forEach((btn, i) => {
+            btn.classList.toggle('active', i === idx);
+        });
+    }
+
+    // ── HLS / video ───────────────────────────────────────────
+    function destroyHls() {
+        if (hlsInstance) { try { hlsInstance.destroy(); } catch (_) {} hlsInstance = null; }
+        if (videoEl) { videoEl.removeAttribute('src'); videoEl.load(); }
+    }
+
+    function showPlaceholder(icon, msg, sub) {
+        placeholder.classList.remove('hidden');
+        placeholder.querySelector('.big-icon').textContent = icon;
+        placeholder.querySelectorAll('div:not(.big-icon):not(.sub)')[0].textContent = msg;
+        placeholder.querySelector('.sub').textContent = sub;
+    }
+
+    function loadUrl(url) {
+        if (!url || !url.trim()) { setStatus('Invalid URL', false, true); return; }
+        const trimmed = url.trim();
+        if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+            setStatus('Invalid URL (must start with http:// or https://)', false, true); return;
+        }
+
+        showPlaceholder('⏳', 'Loading stream…', 'Please wait');
+        playerWrapper.classList.add('loading');
+        setStatus('Loading…', true);
+        destroyHls();
+
+        // Native HLS (Safari)
+        if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+            videoEl.src = trimmed;
+            videoEl.play().catch(err => {
+                setStatus('Native HLS error', false, true);
+                showPlaceholder('⚠️', 'Playback error', err.message || 'Unknown error');
+                playerWrapper.classList.remove('loading');
+            });
+            videoEl.addEventListener('loadedmetadata', () => {
+                placeholder.classList.add('hidden');
+                playerWrapper.classList.remove('loading');
+                setStatus('Playing (native HLS)', true);
+            }, { once: true });
+            videoEl.addEventListener('error', () => {
+                setStatus('Native HLS error', false, true);
+                showPlaceholder('❌', 'Playback failed', 'Check the URL or try a different browser');
+                playerWrapper.classList.remove('loading');
+            }, { once: true });
+            return;
+        }
+
+        if (!Hls.isSupported()) {
+            setStatus('HLS not supported in this browser', false, true);
+            showPlaceholder('🚫', 'HLS not supported', 'Please use Chrome, Edge, or Firefox');
+            playerWrapper.classList.remove('loading');
+            return;
+        }
+
+        const hls = new Hls({ enableWorker: true, lowLatencyMode: true, backbufferLength: 30 });
+        hlsInstance = hls;
+        hls.attachMedia(videoEl);
+
+        hls.on(Hls.Events.MEDIA_ATTACHED, () => { hls.loadSource(trimmed); setStatus('Loading source…', true); });
+
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            placeholder.classList.add('hidden');
+            playerWrapper.classList.remove('loading');
+            setStatus('Playing (HLS.js)', true);
+            videoEl.play().catch(() => setStatus('Ready — click play', true));
+        });
+
+        hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+                setStatus('Fatal HLS error', false, true);
+                showPlaceholder('❌', 'Stream error', data.details || 'Could not load stream');
+                playerWrapper.classList.remove('loading');
+                if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+            } else {
+                setStatus('HLS warning: ' + (data.details || ''), false);
             }
+        });
 
-            // ─── SERVER RENDERING ─────────────────────────────────────
+        const timeout = setTimeout(() => {
+            if (!placeholder.classList.contains('hidden'))
+                placeholder.querySelector('.sub').textContent = 'Still loading… check your connection';
+        }, 8000);
 
-            function renderServers() {
-                serverButtons.innerHTML = '';
-                serverCount.textContent = servers.length;
+        hls.on(Hls.Events.MANIFEST_PARSED, () => clearTimeout(timeout));
+        hls.on(Hls.Events.ERROR, () => clearTimeout(timeout));
+    }
 
-                servers.forEach((server, idx) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'server-btn';
-                    if (idx === activeServerIndex) {
-                        btn.classList.add('active');
-                    }
+    // ── controls ──────────────────────────────────────────────
+    muteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        videoEl.muted = !videoEl.muted;
+        showUI();
+    });
 
-                    const statusSpan = document.createElement('span');
-                    statusSpan.className = 'server-status';
+    fullscreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!document.fullscreenElement)
+            playerWrapper.requestFullscreen?.() || playerWrapper.webkitRequestFullscreen?.();
+        else
+            document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        showUI();
+    });
 
-                    const nameSpan = document.createElement('span');
-                    nameSpan.textContent = server.name;
+    videoEl.addEventListener('volumechange', () => {
+        muteBtn.textContent = videoEl.muted ? '🔇' : '🔊';
+        muteBtn.classList.toggle('muted', videoEl.muted);
+    });
 
-                    const shortcutSpan = document.createElement('span');
-                    shortcutSpan.className = 'server-shortcut';
-                    shortcutSpan.textContent = `[${idx + 1}]`;
+    // ── init ──────────────────────────────────────────────────
+    function init() {
+        loadServersFromStorage();
+        renderServers();
 
-                    btn.appendChild(statusSpan);
-                    btn.appendChild(nameSpan);
-                    btn.appendChild(shortcutSpan);
+        muteBtn.textContent = videoEl.muted ? '🔇' : '🔊';
+        muteBtn.classList.toggle('muted', videoEl.muted);
 
-                    // click → load this server's URL
-                    btn.addEventListener('click', () => {
-                        loadUrl(server.url);
-                        setActiveServer(idx);
-                        setStatus(`Loaded ${server.name}`, true);
-                    });
+        setupInteraction();
 
-                    // right-click → remove server (if more than 1)
-                    btn.addEventListener('contextmenu', (e) => {
-                        e.preventDefault();
-                        if (servers.length <= 1) {
-                            setStatus('Cannot remove the last server', false, true);
-                            return;
-                        }
-                        if (confirm(`Remove "${server.name}"?`)) {
-                            servers.splice(idx, 1);
-                            if (activeServerIndex === idx) activeServerIndex = -1;
-                            else if (activeServerIndex > idx) activeServerIndex--;
-                            persistServers();
-                            setStatus(`Removed ${server.name}`, false);
-                        }
-                    });
+        // show UI briefly on load, then hide
+        showUI();
 
-                    serverButtons.appendChild(btn);
-                });
-            }
+        if (servers.length > 0) {
+            loadUrl(servers[0].url);
+            setActiveServer(0);
+            setStatus(`Auto-loaded ${servers[0].name}`, true);
+        } else {
+            setStatus('No servers available', false, true);
+        }
 
-            function setActiveServer(idx) {
-                activeServerIndex = idx;
-                const btns = serverButtons.querySelectorAll('.server-btn');
-                btns.forEach((btn, i) => {
-                    btn.classList.toggle('active', i === idx);
-                });
-            }
+        videoEl.addEventListener('play', () => {
+            placeholder.classList.add('hidden');
+            playerWrapper.classList.remove('loading');
+            setStatus('Playing', true);
+        });
 
-            function clearActiveServer() {
-                activeServerIndex = -1;
-                const btns = serverButtons.querySelectorAll('.server-btn');
-                btns.forEach((btn) => btn.classList.remove('active'));
-            }
+        videoEl.addEventListener('pause', () => { if (videoEl.src) setStatus('Paused', false); });
+        videoEl.addEventListener('ended', () => setStatus('Stream ended', false));
+        videoEl.addEventListener('error', () => {
+            if (videoEl.error) setStatus('Video error: ' + (videoEl.error.message || ''), false, true);
+        });
+    }
 
-            // ─── video / HLS ──────────────────────────────────────────
-
-            function destroyHls() {
-                if (hlsInstance) {
-                    try {
-                        hlsInstance.destroy();
-                    } catch (_) { /* ignore */ }
-                    hlsInstance = null;
-                }
-                if (videoEl) {
-                    videoEl.removeAttribute('src');
-                    videoEl.load();
-                }
-            }
-
-            function loadUrl(url) {
-                if (!url || !url.trim()) {
-                    setStatus('Invalid URL', false, true);
-                    return;
-                }
-
-                const trimmed = url.trim();
-                if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
-                    setStatus('Invalid URL (must start with http:// or https://)', false, true);
-                    return;
-                }
-
-                // Show placeholder with loading state
-                placeholder.classList.remove('hidden');
-                placeholder.querySelector('.big-icon').textContent = '⏳';
-                placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent = 'Loading stream…';
-                placeholder.querySelector('.sub').textContent = 'Please wait';
-                playerWrapper.classList.add('loading');
-                setStatus('Loading…', true);
-
-                destroyHls();
-
-                // Native HLS (Safari)
-                if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
-                    videoEl.src = trimmed;
-                    videoEl.play().catch((err) => {
-                        console.warn('Native playback error:', err);
-                        setStatus('Native HLS error — try another browser', false, true);
-                        placeholder.classList.remove('hidden');
-                        playerWrapper.classList.remove('loading');
-                        placeholder.querySelector('.big-icon').textContent = '⚠️';
-                        placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                            'Playback error';
-                        placeholder.querySelector('.sub').textContent = err.message || 'Unknown error';
-                    });
-                    videoEl.addEventListener('loadedmetadata', () => {
-                        placeholder.classList.add('hidden');
-                        playerWrapper.classList.remove('loading');
-                        setStatus('Playing (native HLS)', true);
-                    }, { once: true });
-                    videoEl.addEventListener('error', () => {
-                        setStatus('Native HLS error', false, true);
-                        placeholder.classList.remove('hidden');
-                        playerWrapper.classList.remove('loading');
-                        placeholder.querySelector('.big-icon').textContent = '❌';
-                        placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                            'Playback failed';
-                        placeholder.querySelector('.sub').textContent =
-                            'Check the URL or try a different browser';
-                    }, { once: true });
-                    return;
-                }
-
-                // hls.js
-                if (!Hls.isSupported()) {
-                    setStatus('HLS not supported in this browser', false, true);
-                    placeholder.querySelector('.big-icon').textContent = '🚫';
-                    placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                        'HLS not supported';
-                    placeholder.querySelector('.sub').textContent =
-                        'Please use a modern browser (Chrome, Edge, Firefox)';
-                    playerWrapper.classList.remove('loading');
-                    return;
-                }
-
-                const hls = new Hls({
-                    enableWorker: true,
-                    lowLatencyMode: true,
-                    backbufferLength: 30,
-                });
-
-                hlsInstance = hls;
-
-                hls.attachMedia(videoEl);
-
-                hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-                    hls.loadSource(trimmed);
-                    setStatus('Loading source…', true);
-                });
-
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    placeholder.classList.add('hidden');
-                    playerWrapper.classList.remove('loading');
-                    setStatus('Playing (HLS.js)', true);
-                    videoEl.play().catch((err) => {
-                        console.warn('Autoplay blocked:', err);
-                        setStatus('Ready — click play', true);
-                    });
-                });
-
-                hls.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        setStatus('Fatal HLS error', false, true);
-                        placeholder.classList.remove('hidden');
-                        playerWrapper.classList.remove('loading');
-                        placeholder.querySelector('.big-icon').textContent = '❌';
-                        placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent =
-                            'Stream error';
-                        placeholder.querySelector('.sub').textContent =
-                            data.details || 'Could not load stream';
-                        if (hlsInstance) {
-                            hlsInstance.destroy();
-                            hlsInstance = null;
-                        }
-                    } else {
-                        setStatus('HLS warning: ' + (data.details || ''), false);
-                    }
-                });
-
-                const timeout = setTimeout(() => {
-                    if (!placeholder.classList.contains('hidden')) {
-                        placeholder.querySelector('.sub').textContent =
-                            'Still loading… check your connection';
-                    }
-                }, 8000);
-
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    clearTimeout(timeout);
-                });
-
-                hls.on(Hls.Events.ERROR, () => {
-                    clearTimeout(timeout);
-                });
-            }
-
-            // ─── init ──────────────────────────────────────────────────
-
-            function init() {
-                loadServersFromStorage();
-                renderServers();
-
-                // pre-fill placeholder message
-                setStatus('Ready — click a server');
-
-                // video events
-                videoEl.addEventListener('play', () => {
-                    placeholder.classList.add('hidden');
-                    playerWrapper.classList.remove('loading');
-                    setStatus('Playing', true);
-                });
-
-                videoEl.addEventListener('pause', () => {
-                    if (!videoEl.src) return;
-                    setStatus('Paused', false);
-                });
-
-                videoEl.addEventListener('ended', () => {
-                    setStatus('Stream ended', false);
-                });
-
-                videoEl.addEventListener('error', (e) => {
-                    if (videoEl.error) {
-                        setStatus('Video error: ' + (videoEl.error.message || ''), false, true);
-                    }
-                });
-            }
-
-            // ─── start ──────────────────────────────────────────────────
-            init();
-        })();
-    </script>
+    init();
+})();
+</script>
 
 </body>
 </html>
