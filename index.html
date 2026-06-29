@@ -10,37 +10,32 @@
     </script>
 
     <style>
-        /* ───────────── reset & base ───────────── */
+        /* ───────────── full-screen reset ───────────── */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html,
         body {
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             background: #0b0d11;
             color: #e8edf5;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
         }
 
+        /* ───────────── container ───────────── */
         .app-container {
-            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
             width: 100%;
-            background: #151a22;
-            border-radius: 28px;
-            padding: 28px 30px 34px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-            border: 1px solid #2a303c;
-            transition: border-color 0.25s;
-        }
-
-        .app-container:hover {
-            border-color: #3f485a;
+            padding: 20px 24px 24px 24px;
+            background: #0b0d11;
+            gap: 14px;
         }
 
         /* ───────────── header ───────────── */
@@ -48,7 +43,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 18px;
+            flex-shrink: 0;
         }
 
         .header .icon {
@@ -75,11 +70,12 @@
             color: #9bb1d0;
             border: 1px solid #2d384a;
             letter-spacing: 0.3px;
+            flex-shrink: 0;
         }
 
         /* ───────────── SERVER BUTTONS ───────────── */
         .server-section {
-            margin-bottom: 16px;
+            flex-shrink: 0;
         }
 
         .server-section .server-label {
@@ -138,11 +134,6 @@
             transform: translateY(0px);
         }
 
-        .server-btn .server-icon {
-            font-size: 16px;
-            opacity: 0.6;
-        }
-
         .server-btn .server-status {
             display: none;
             width: 8px;
@@ -170,126 +161,13 @@
             opacity: 0.6;
         }
 
-        /* ───────────── URL bar ───────────── */
-        .url-section {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
-        }
-
-        .url-input-wrapper {
-            flex: 1;
-            min-width: 220px;
-            position: relative;
-        }
-
-        .url-input-wrapper input {
-            width: 100%;
-            padding: 14px 18px;
-            background: #0f141c;
-            border: 1.5px solid #28303e;
-            border-radius: 16px;
-            color: #eef3fc;
-            font-size: 15px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            outline: none;
-            transition: border-color 0.25s, box-shadow 0.2s;
-            letter-spacing: 0.2px;
-        }
-
-        .url-input-wrapper input:focus {
-            border-color: #5a7bcf;
-            box-shadow: 0 0 0 4px rgba(74, 120, 255, 0.15);
-        }
-
-        .url-input-wrapper input::placeholder {
-            color: #4f5a6e;
-            font-family: 'Segoe UI', sans-serif;
-            letter-spacing: 0px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border: none;
-            border-radius: 16px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #3b6cf4, #5a3fd6);
-            color: #fff;
-            box-shadow: 0 6px 20px rgba(59, 108, 244, 0.25);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(59, 108, 244, 0.35);
-            background: linear-gradient(135deg, #4d7aff, #6b4fe6);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0px);
-            box-shadow: 0 4px 12px rgba(59, 108, 244, 0.3);
-        }
-
-        .btn-secondary {
-            background: #1f2a3a;
-            color: #c8d6f0;
-            border: 1px solid #2f3a4e;
-        }
-
-        .btn-secondary:hover {
-            background: #2b384c;
-            border-color: #40506a;
-            color: #fff;
-        }
-
-        .btn-success {
-            background: #1e8b4c;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(30, 139, 76, 0.25);
-        }
-
-        .btn-success:hover {
-            background: #24a05a;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(30, 139, 76, 0.35);
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 13px;
-            border-radius: 12px;
-        }
-
-        .btn-danger {
-            background: #8b2d3a;
-            color: #fff;
-            border: 1px solid #a03a4a;
-        }
-
-        .btn-danger:hover {
-            background: #a53a4a;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(180, 60, 80, 0.25);
-        }
-
-        /* ───────────── action row ───────────── */
+        /* ───────────── status row ───────────── */
         .action-row {
+            flex-shrink: 0;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             gap: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
         }
 
         .action-row .status-badge {
@@ -322,44 +200,45 @@
             box-shadow: 0 0 12px rgba(240, 103, 103, 0.35);
         }
 
-        /* ───────────── video player ───────────── */
+        /* ───────────── video player (fills remaining space) ───────────── */
         .player-wrapper {
-            margin-top: 20px;
+            flex: 1;
+            min-height: 0;
             border-radius: 18px;
             overflow: hidden;
             background: #0a0e14;
             position: relative;
             border: 1px solid #212a36;
-            transition: border-color 0.3s;
-        }
-
-        .player-wrapper:focus-within {
-            border-color: #4d70c0;
         }
 
         #videoPlayer {
             width: 100%;
+            height: 100%;
             display: block;
-            aspect-ratio: 16 / 9;
             background: #080b10;
             object-fit: contain;
         }
 
-        /* fallback / placeholder overlay */
+        /* placeholder overlay */
         .player-placeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: 100%;
             background: #0d121b;
             color: #3f4c62;
             font-size: 15px;
             gap: 12px;
             padding: 30px;
             text-align: center;
-            border-radius: 18px;
             user-select: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 18px;
+            pointer-events: none;
         }
 
         .player-placeholder .big-icon {
@@ -388,62 +267,19 @@
             }
         }
 
-        /* ───────────── server add row ───────────── */
-        .server-add-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-            align-items: center;
+        .hidden {
+            display: none !important;
         }
 
-        .server-add-row input {
-            flex: 1;
-            min-width: 140px;
-            padding: 8px 14px;
-            background: #0f141c;
-            border: 1.5px solid #28303e;
-            border-radius: 12px;
-            color: #eef3fc;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.25s;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-        }
-
-        .server-add-row input:focus {
-            border-color: #5a7bcf;
-            box-shadow: 0 0 0 3px rgba(74, 120, 255, 0.12);
-        }
-
-        .server-add-row input::placeholder {
-            color: #4f5a6e;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .server-add-row .btn-sm {
-            padding: 8px 16px;
-            font-size: 13px;
-        }
-
-        /* ───────────── responsive ───────────── */
+        /* ───────────── responsive tweaks ───────────── */
         @media (max-width: 720px) {
             .app-container {
-                padding: 18px 16px 22px;
-                border-radius: 20px;
+                padding: 14px 16px 16px 16px;
+                gap: 12px;
             }
 
             .header h1 {
                 font-size: 20px;
-            }
-
-            .url-section {
-                flex-direction: column;
-            }
-
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
             }
 
             .server-btn {
@@ -455,8 +291,8 @@
                 display: none;
             }
 
-            .server-add-row input {
-                min-width: 120px;
+            .player-wrapper {
+                border-radius: 12px;
             }
         }
 
@@ -469,19 +305,6 @@
                 padding: 6px 12px;
                 font-size: 12px;
             }
-        }
-
-        /* ───────────── utility ───────────── */
-        .hidden {
-            display: none !important;
-        }
-        .mt-1 {
-            margin-top: 6px;
-        }
-        .text-ellipsis {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     </style>
 </head>
@@ -508,33 +331,9 @@
             <div class="server-buttons" id="serverButtons">
                 <!-- rendered by JS -->
             </div>
-
-            <!-- inline "add server" row -->
-            <div class="server-add-row">
-                <input type="text" id="newServerName" placeholder="Name (e.g. Server 4)" />
-                <input type="text" id="newServerUrl" placeholder="M3U8 URL" />
-                <button class="btn btn-secondary btn-sm" id="addServerBtn">➕ Add</button>
-                <button class="btn btn-danger btn-sm" id="resetServersBtn" title="Reset to default servers">↺ Reset</button>
-            </div>
         </div>
 
-        <!-- URL INPUT -->
-        <div class="url-section">
-            <div class="url-input-wrapper">
-                <input
-                type="text"
-                id="urlInput"
-                placeholder="Paste your .m3u8 URL here…"
-                spellcheck="false"
-                autofocus
-                />
-            </div>
-            <button class="btn btn-primary" id="loadBtn">
-                <span>▶</span> Load &amp; Play
-            </button>
-        </div>
-
-        <!-- ACTION ROW (status only) -->
+        <!-- STATUS ROW -->
         <div class="action-row">
             <div class="status-badge" id="statusBadge">
                 <span class="dot" id="statusDot"></span>
@@ -542,13 +341,13 @@
             </div>
         </div>
 
-        <!-- VIDEO PLAYER -->
+        <!-- VIDEO PLAYER (fills remaining height) -->
         <div class="player-wrapper" id="playerWrapper">
             <video id="videoPlayer" controls playsinline preload="metadata"></video>
             <div class="player-placeholder" id="placeholderOverlay">
                 <div class="big-icon">🎬</div>
-                <div>Enter an M3U8 URL above</div>
-                <div class="sub">Supports HLS live streams · .m3u8</div>
+                <div>Select a server to start</div>
+                <div class="sub">HLS live streams · .m3u8</div>
             </div>
         </div>
 
@@ -559,21 +358,13 @@
             'use strict';
 
             // ─── DOM refs ──────────────────────────────────────────────
-            const urlInput = document.getElementById('urlInput');
-            const loadBtn = document.getElementById('loadBtn');
             const videoEl = document.getElementById('videoPlayer');
             const placeholder = document.getElementById('placeholderOverlay');
             const playerWrapper = document.getElementById('playerWrapper');
-
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
-
             const serverButtons = document.getElementById('serverButtons');
             const serverCount = document.getElementById('serverCount');
-            const newServerName = document.getElementById('newServerName');
-            const newServerUrl = document.getElementById('newServerUrl');
-            const addServerBtn = document.getElementById('addServerBtn');
-            const resetServersBtn = document.getElementById('resetServersBtn');
 
             // ─── state ──────────────────────────────────────────────────
             const SERVERS_STORAGE_KEY = 'm3u8_viewer_servers';
@@ -590,7 +381,6 @@
             }];
 
             let hlsInstance = null;
-            let currentUrl = '';
             let servers = [];
             let activeServerIndex = -1;
 
@@ -665,7 +455,6 @@
                     btn.addEventListener('click', () => {
                         loadUrl(server.url);
                         setActiveServer(idx);
-                        urlInput.value = server.url;
                         setStatus(`Loaded ${server.name}`, true);
                     });
 
@@ -720,7 +509,7 @@
 
             function loadUrl(url) {
                 if (!url || !url.trim()) {
-                    setStatus('Please enter a URL', false, true);
+                    setStatus('Invalid URL', false, true);
                     return;
                 }
 
@@ -730,13 +519,7 @@
                     return;
                 }
 
-                if (!trimmed.includes('.m3u8')) {
-                    setStatus('Warning: URL does not contain .m3u8 — trying anyway…', false);
-                }
-
-                currentUrl = trimmed;
-                urlInput.value = trimmed;
-
+                // Show placeholder with loading state
                 placeholder.classList.remove('hidden');
                 placeholder.querySelector('.big-icon').textContent = '⏳';
                 placeholder.querySelector('div:not(.big-icon):not(.sub)').textContent = 'Loading stream…';
@@ -849,108 +632,14 @@
                 });
             }
 
-            // ─── add server ───────────────────────────────────────────
-
-            function addServer() {
-                const name = newServerName.value.trim();
-                const url = newServerUrl.value.trim();
-                if (!name) {
-                    setStatus('Please enter a server name', false, true);
-                    return;
-                }
-                if (!url) {
-                    setStatus('Please enter a server URL', false, true);
-                    return;
-                }
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    setStatus('Invalid URL — must start with http:// or https://', false, true);
-                    return;
-                }
-                if (servers.some(s => s.name.toLowerCase() === name.toLowerCase())) {
-                    setStatus(`Server "${name}" already exists`, false, true);
-                    return;
-                }
-                servers.push({ name, url });
-                persistServers();
-                newServerName.value = '';
-                newServerUrl.value = '';
-                setStatus(`Added "${name}" ✓`, false);
-            }
-
-            // ─── reset servers ────────────────────────────────────────
-
-            function resetServers() {
-                if (servers.length === DEFAULT_SERVERS.length &&
-                    servers.every((s, i) => s.name === DEFAULT_SERVERS[i].name && s.url === DEFAULT_SERVERS[i].url)) {
-                    setStatus('Already using default servers', false);
-                    return;
-                }
-                if (confirm('Reset to default server list?')) {
-                    servers = JSON.parse(JSON.stringify(DEFAULT_SERVERS));
-                    activeServerIndex = -1;
-                    persistServers();
-                    setStatus('Reset to default servers', false);
-                }
-            }
-
             // ─── init ──────────────────────────────────────────────────
 
             function init() {
                 loadServersFromStorage();
                 renderServers();
 
-                // pre-fill default URL from first server if available
-                if (servers.length > 0 && servers[0].url) {
-                    urlInput.value = servers[0].url;
-                }
-
-                // ── event listeners ──
-
-                loadBtn.addEventListener('click', () => {
-                    const val = urlInput.value.trim();
-                    if (val) {
-                        loadUrl(val);
-                        clearActiveServer();
-                    } else {
-                        setStatus('Please enter a URL', false, true);
-                    }
-                });
-
-                addServerBtn.addEventListener('click', addServer);
-
-                resetServersBtn.addEventListener('click', resetServers);
-
-                // Enter key on URL input
-                urlInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = urlInput.value.trim();
-                        if (val) {
-                            loadUrl(val);
-                            clearActiveServer();
-                        } else {
-                            setStatus('Please enter a URL', false, true);
-                        }
-                    }
-                });
-
-                // Enter key on new server name/url fields
-                newServerName.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (newServerUrl.value.trim()) {
-                            addServer();
-                        } else {
-                            newServerUrl.focus();
-                        }
-                    }
-                });
-                newServerUrl.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addServer();
-                    }
-                });
+                // pre-fill placeholder message
+                setStatus('Ready — click a server');
 
                 // video events
                 videoEl.addEventListener('play', () => {
@@ -973,8 +662,6 @@
                         setStatus('Video error: ' + (videoEl.error.message || ''), false, true);
                     }
                 });
-
-                setStatus('Ready — click a server or paste URL');
             }
 
             // ─── start ──────────────────────────────────────────────────
