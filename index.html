@@ -163,21 +163,6 @@
             display: inline-block;
         }
 
-        .server-btn .server-badge {
-            font-size: 10px;
-            background: #1f2a3a;
-            padding: 1px 8px;
-            border-radius: 100px;
-            color: #6f86a8;
-            font-weight: 400;
-            letter-spacing: 0.2px;
-        }
-
-        .server-btn.active .server-badge {
-            background: #2a3d5c;
-            color: #9bb5dd;
-        }
-
         .server-btn .server-shortcut {
             font-size: 11px;
             color: #4f6180;
@@ -337,19 +322,6 @@
             box-shadow: 0 0 12px rgba(240, 103, 103, 0.35);
         }
 
-        .action-row .saved-link-hint {
-            font-size: 13px;
-            color: #7a8db0;
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .action-row .saved-link-hint .link-icon {
-            font-size: 16px;
-        }
-
         /* ───────────── video player ───────────── */
         .player-wrapper {
             margin-top: 20px;
@@ -416,184 +388,7 @@
             }
         }
 
-        /* ───────────── saved links list ───────────── */
-        .saved-links-section {
-            margin-top: 24px;
-            border-top: 1px solid #202835;
-            padding-top: 20px;
-        }
-
-        .saved-links-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .saved-links-header h3 {
-            font-size: 15px;
-            font-weight: 500;
-            color: #b2c4e0;
-            letter-spacing: 0.2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .saved-links-header h3 span {
-            background: #1f2a3a;
-            font-size: 12px;
-            padding: 0 10px;
-            border-radius: 100px;
-            color: #8fa2c4;
-        }
-
-        .saved-links-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            max-height: 100px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .saved-links-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .saved-links-list::-webkit-scrollbar-track {
-            background: #141b24;
-            border-radius: 10px;
-        }
-        .saved-links-list::-webkit-scrollbar-thumb {
-            background: #2f3c50;
-            border-radius: 10px;
-        }
-
-        .saved-link-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #121a24;
-            padding: 6px 14px 6px 16px;
-            border-radius: 100px;
-            border: 1px solid #26303f;
-            font-size: 13px;
-            color: #c8d6f0;
-            cursor: pointer;
-            transition: all 0.2s;
-            max-width: 320px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .saved-link-chip:hover {
-            background: #1c283a;
-            border-color: #3a4b64;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .saved-link-chip .chip-index {
-            color: #5a6f8f;
-            font-weight: 500;
-            font-size: 11px;
-            margin-right: 2px;
-        }
-
-        .saved-link-chip .remove-btn {
-            background: none;
-            border: none;
-            color: #5a6f8f;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 0 2px;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-
-        .saved-link-chip .remove-btn:hover {
-            color: #f06767;
-        }
-
-        .empty-links-msg {
-            color: #3e4b60;
-            font-size: 13px;
-            padding: 6px 0;
-        }
-
-        /* ───────────── responsive ───────────── */
-        @media (max-width: 720px) {
-            .app-container {
-                padding: 18px 16px 22px;
-                border-radius: 20px;
-            }
-
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .url-section {
-                flex-direction: column;
-            }
-
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-
-            .action-row .saved-link-hint {
-                margin-left: 0;
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .saved-link-chip {
-                max-width: 200px;
-                font-size: 12px;
-                padding: 5px 12px 5px 14px;
-            }
-
-            .server-btn {
-                padding: 8px 16px;
-                font-size: 13px;
-            }
-
-            .server-btn .server-shortcut {
-                display: none;
-            }
-        }
-
-        @media (max-width: 440px) {
-            .header .badge {
-                display: none;
-            }
-            .saved-link-chip {
-                max-width: 140px;
-            }
-            .server-btn {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-            .server-btn .server-badge {
-                display: none;
-            }
-        }
-
-        /* ───────────── utility ───────────── */
-        .hidden {
-            display: none !important;
-        }
-        .mt-1 {
-            margin-top: 6px;
-        }
-        .text-ellipsis {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ───────────── server add modal (inline) ───────────── */
+        /* ───────────── server add row ───────────── */
         .server-add-row {
             display: flex;
             gap: 8px;
@@ -604,7 +399,7 @@
 
         .server-add-row input {
             flex: 1;
-            min-width: 160px;
+            min-width: 140px;
             padding: 8px 14px;
             background: #0f141c;
             border: 1.5px solid #28303e;
@@ -629,6 +424,64 @@
         .server-add-row .btn-sm {
             padding: 8px 16px;
             font-size: 13px;
+        }
+
+        /* ───────────── responsive ───────────── */
+        @media (max-width: 720px) {
+            .app-container {
+                padding: 18px 16px 22px;
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .url-section {
+                flex-direction: column;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .server-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .server-btn .server-shortcut {
+                display: none;
+            }
+
+            .server-add-row input {
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 440px) {
+            .header .badge {
+                display: none;
+            }
+
+            .server-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* ───────────── utility ───────────── */
+        .hidden {
+            display: none !important;
+        }
+        .mt-1 {
+            margin-top: 6px;
+        }
+        .text-ellipsis {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -679,26 +532,14 @@
             <button class="btn btn-primary" id="loadBtn">
                 <span>▶</span> Load &amp; Play
             </button>
-            <button class="btn btn-secondary" id="saveBtn">
-                <span>💾</span> Save Link
-            </button>
         </div>
 
-        <!-- ACTION ROW -->
+        <!-- ACTION ROW (status only) -->
         <div class="action-row">
             <div class="status-badge" id="statusBadge">
                 <span class="dot" id="statusDot"></span>
                 <span id="statusText">Ready</span>
             </div>
-
-            <div class="saved-link-hint" id="savedHint">
-                <span class="link-icon">🔗</span>
-                <span id="savedLinkDisplay">No saved link</span>
-            </div>
-
-            <button class="btn btn-success btn-sm" id="showSavedBtn">
-                <span>📂</span> Show Saved
-            </button>
         </div>
 
         <!-- VIDEO PLAYER -->
@@ -711,21 +552,6 @@
             </div>
         </div>
 
-        <!-- SAVED LINKS -->
-        <div class="saved-links-section">
-            <div class="saved-links-header">
-                <h3>
-                    📋 Saved Links
-                    <span id="savedCount">0</span>
-                </h3>
-                <button class="btn btn-secondary btn-sm" id="clearSavedBtn">
-                    Clear All
-                </button>
-            </div>
-            <div class="saved-links-list" id="savedLinksList">
-                <div class="empty-links-msg">No saved links yet.</div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -735,18 +561,12 @@
             // ─── DOM refs ──────────────────────────────────────────────
             const urlInput = document.getElementById('urlInput');
             const loadBtn = document.getElementById('loadBtn');
-            const saveBtn = document.getElementById('saveBtn');
-            const showSavedBtn = document.getElementById('showSavedBtn');
-            const clearSavedBtn = document.getElementById('clearSavedBtn');
             const videoEl = document.getElementById('videoPlayer');
             const placeholder = document.getElementById('placeholderOverlay');
             const playerWrapper = document.getElementById('playerWrapper');
 
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
-            const savedLinkDisplay = document.getElementById('savedLinkDisplay');
-            const savedLinksList = document.getElementById('savedLinksList');
-            const savedCount = document.getElementById('savedCount');
 
             const serverButtons = document.getElementById('serverButtons');
             const serverCount = document.getElementById('serverCount');
@@ -756,10 +576,8 @@
             const resetServersBtn = document.getElementById('resetServersBtn');
 
             // ─── state ──────────────────────────────────────────────────
-            const STORAGE_KEY = 'm3u8_viewer_saved_links';
             const SERVERS_STORAGE_KEY = 'm3u8_viewer_servers';
 
-            // ─── DEFAULT SERVERS ──────────────────────────────────────
             const DEFAULT_SERVERS = [{
                 name: 'Server 1',
                 url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_1750.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P'
@@ -771,34 +589,12 @@
                 url: 'https://prod-cdn01-live.toffeelive.com/live/FIFA-2026/sst/0/master_750.m3u8?hdntl=Expires=1782840485~_GO=Generated~URLPrefix=aHR0cHM6Ly9wcm9kLWNkbjAxLWxpdmUudG9mZmVlbGl2ZS5jb20~Signature=AeQsclC0uaUD73C5ioeXBuP0KQMiPascuZsxuBTSptw2XJObY_EOhdDMuAf-SEpA-2Gvu0BSh1oStm4smvxA70eui14P'
             }];
 
-            let savedLinks = [];
             let hlsInstance = null;
             let currentUrl = '';
             let servers = [];
             let activeServerIndex = -1;
 
             // ─── helpers ──────────────────────────────────────────────
-
-            function loadSavedFromStorage() {
-                try {
-                    const data = localStorage.getItem(STORAGE_KEY);
-                    if (data) {
-                        const parsed = JSON.parse(data);
-                        if (Array.isArray(parsed)) {
-                            savedLinks = parsed;
-                            return;
-                        }
-                    }
-                } catch (_) { /* ignore */ }
-                savedLinks = [];
-            }
-
-            function persistSaved() {
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedLinks));
-                } catch (_) { /* ignore */ }
-                renderSavedLinks();
-            }
 
             function loadServersFromStorage() {
                 try {
@@ -838,75 +634,6 @@
                 }
             }
 
-            function updateSavedHint() {
-                if (savedLinks.length === 0) {
-                    savedLinkDisplay.textContent = 'No saved link';
-                    return;
-                }
-                const last = savedLinks[savedLinks.length - 1];
-                savedLinkDisplay.textContent = last.length > 60 ? last.slice(0, 58) + '…' : last;
-                savedLinkDisplay.title = last;
-            }
-
-            function renderSavedLinks() {
-                const list = savedLinksList;
-                list.innerHTML = '';
-
-                if (savedLinks.length === 0) {
-                    list.innerHTML = '<div class="empty-links-msg">No saved links yet.</div>';
-                    savedCount.textContent = '0';
-                    updateSavedHint();
-                    return;
-                }
-
-                savedCount.textContent = savedLinks.length;
-                updateSavedHint();
-
-                savedLinks.forEach((link, index) => {
-                    const chip = document.createElement('div');
-                    chip.className = 'saved-link-chip';
-                    chip.title = link;
-
-                    const idxSpan = document.createElement('span');
-                    idxSpan.className = 'chip-index';
-                    idxSpan.textContent = `#${index + 1}`;
-
-                    const textSpan = document.createElement('span');
-                    textSpan.className = 'text-ellipsis';
-                    textSpan.textContent = link.length > 50 ? link.slice(0, 48) + '…' : link;
-                    textSpan.style.flex = '1';
-
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'remove-btn';
-                    removeBtn.textContent = '✕';
-                    removeBtn.setAttribute('aria-label', 'Remove link');
-
-                    chip.appendChild(idxSpan);
-                    chip.appendChild(textSpan);
-                    chip.appendChild(removeBtn);
-
-                    chip.addEventListener('click', (e) => {
-                        if (e.target === removeBtn) return;
-                        urlInput.value = link;
-                        loadUrl(link);
-                        clearActiveServer();
-                    });
-
-                    removeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        savedLinks.splice(index, 1);
-                        persistSaved();
-                        if (savedLinks.length === 0) {
-                            savedLinkDisplay.textContent = 'No saved link';
-                        } else {
-                            updateSavedHint();
-                        }
-                    });
-
-                    list.appendChild(chip);
-                });
-            }
-
             // ─── SERVER RENDERING ─────────────────────────────────────
 
             function renderServers() {
@@ -920,36 +647,18 @@
                         btn.classList.add('active');
                     }
 
-                    // Icon based on index
-                    const icons = ['🟢', '🔵', '🟠', '🟣', '🔴', '🟡', '🟤', '⚫'];
-                    const icon = icons[idx % icons.length];
-
                     const statusSpan = document.createElement('span');
                     statusSpan.className = 'server-status';
 
                     const nameSpan = document.createElement('span');
                     nameSpan.textContent = server.name;
 
-                    const badgeSpan = document.createElement('span');
-                    badgeSpan.className = 'server-badge';
-                    // show short URL preview
-                    let short = server.url;
-                    try {
-                        const u = new URL(server.url);
-                        short = u.hostname + u.pathname.slice(0, 20) + '…';
-                    } catch (_) { short = server.url.slice(0, 30) + '…'; }
-                    badgeSpan.textContent = short;
-
                     const shortcutSpan = document.createElement('span');
                     shortcutSpan.className = 'server-shortcut';
                     shortcutSpan.textContent = `[${idx + 1}]`;
 
                     btn.appendChild(statusSpan);
-                    btn.appendChild(document.createTextNode(' '));
                     btn.appendChild(nameSpan);
-                    btn.appendChild(document.createTextNode(' '));
-                    btn.appendChild(badgeSpan);
-                    btn.appendChild(document.createTextNode(' '));
                     btn.appendChild(shortcutSpan);
 
                     // click → load this server's URL
@@ -968,7 +677,6 @@
                             return;
                         }
                         if (confirm(`Remove "${server.name}"?`)) {
-                            const removedUrl = server.url;
                             servers.splice(idx, 1);
                             if (activeServerIndex === idx) activeServerIndex = -1;
                             else if (activeServerIndex > idx) activeServerIndex--;
@@ -983,7 +691,6 @@
 
             function setActiveServer(idx) {
                 activeServerIndex = idx;
-                // update all buttons
                 const btns = serverButtons.querySelectorAll('.server-btn');
                 btns.forEach((btn, i) => {
                     btn.classList.toggle('active', i === idx);
@@ -1142,70 +849,6 @@
                 });
             }
 
-            // ─── save link ─────────────────────────────────────────────
-
-            function saveCurrentUrl() {
-                const url = urlInput.value.trim();
-                if (!url) {
-                    setStatus('Nothing to save — enter a URL first', false, true);
-                    return;
-                }
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    setStatus('Invalid URL — must start with http:// or https://', false, true);
-                    return;
-                }
-                const exists = savedLinks.some(
-                    (l) => l.toLowerCase() === url.toLowerCase()
-                );
-                if (exists) {
-                    setStatus('Link already saved ✓', false);
-                    return;
-                }
-
-                savedLinks.push(url);
-                persistSaved();
-                setStatus('Link saved ✓', false);
-                updateSavedHint();
-                savedLinkDisplay.textContent = url.length > 60 ? url.slice(0, 58) + '…' : url;
-                savedLinkDisplay.title = url;
-            }
-
-            // ─── show saved link ──────────────────────────────────────
-
-            function showSavedLink() {
-                if (savedLinks.length === 0) {
-                    setStatus('No saved links to show', false, true);
-                    return;
-                }
-                const last = savedLinks[savedLinks.length - 1];
-                urlInput.value = last;
-                loadUrl(last);
-                clearActiveServer();
-                const chips = savedLinksList.querySelectorAll('.saved-link-chip');
-                if (chips.length > 0) {
-                    const lastChip = chips[chips.length - 1];
-                    lastChip.style.borderColor = '#5a7bcf';
-                    lastChip.style.background = '#1a2740';
-                    setTimeout(() => {
-                        lastChip.style.borderColor = '#26303f';
-                        lastChip.style.background = '#121a24';
-                    }, 1500);
-                }
-                setStatus('Loaded saved link', true);
-            }
-
-            // ─── clear all saved ──────────────────────────────────────
-
-            function clearAllSaved() {
-                if (savedLinks.length === 0) return;
-                if (confirm('Delete all saved links?')) {
-                    savedLinks = [];
-                    persistSaved();
-                    savedLinkDisplay.textContent = 'No saved link';
-                    setStatus('Cleared all links', false);
-                }
-            }
-
             // ─── add server ───────────────────────────────────────────
 
             function addServer() {
@@ -1223,7 +866,6 @@
                     setStatus('Invalid URL — must start with http:// or https://', false, true);
                     return;
                 }
-                // check duplicate name
                 if (servers.some(s => s.name.toLowerCase() === name.toLowerCase())) {
                     setStatus(`Server "${name}" already exists`, false, true);
                     return;
@@ -1233,9 +875,6 @@
                 newServerName.value = '';
                 newServerUrl.value = '';
                 setStatus(`Added "${name}" ✓`, false);
-                // auto-load?
-                // loadUrl(url);
-                // setActiveServer(servers.length - 1);
             }
 
             // ─── reset servers ────────────────────────────────────────
@@ -1257,20 +896,12 @@
             // ─── init ──────────────────────────────────────────────────
 
             function init() {
-                loadSavedFromStorage();
                 loadServersFromStorage();
-                renderSavedLinks();
                 renderServers();
 
                 // pre-fill default URL from first server if available
                 if (servers.length > 0 && servers[0].url) {
                     urlInput.value = servers[0].url;
-                }
-
-                if (savedLinks.length > 0) {
-                    updateSavedHint();
-                } else {
-                    savedLinkDisplay.textContent = 'No saved link';
                 }
 
                 // ── event listeners ──
@@ -1284,12 +915,6 @@
                         setStatus('Please enter a URL', false, true);
                     }
                 });
-
-                saveBtn.addEventListener('click', saveCurrentUrl);
-
-                showSavedBtn.addEventListener('click', showSavedLink);
-
-                clearSavedBtn.addEventListener('click', clearAllSaved);
 
                 addServerBtn.addEventListener('click', addServer);
 
